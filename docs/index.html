@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+>
+<title>SplitSpans</title>
+<link rel="stylesheet" href="../public/styles.css">
+<link rel="stylesheet" href="../public/media-queries.css">
+<link rel="stylesheet" href="../public/prism/prism.css">
+
+<script defer src="../public/prism/prism.js"></script>
+<script defer src="../public/storage.js"></script>
+<script defer src="../public/script.js"></script>
+</head>
+
+<body>
+<main id="content">
+<header>
+<a href="https://MERNCraft.github.io"><img src="../public/svg/home.svg" alt="home"></a>
+<h1>SplitSpans</h1>
+<h3>(set subtitle in 99-Intro.md, if required)</h3>
+<h4>November 2025</h4>
+</header>
+<nav
+  id="content-header"
+  aria-labelledby="content-header"
+>
+  <button type="button" class="previous" disabled>
+    <img src="../public/svg/prev.svg" alt="previous" draggable="false">
+  </button>
+  <span class="previous-name"></span>
+  <span class="spacer"></span>
+  <button type="button" class="next">
+    <img src="../public/svg/next.svg" alt="next" draggable="false">
+  </button>
+  <span class="next-name"></span>
+</nav>
+
+<section id="intro" aria-labelledby="intro" data-item="Introduction">
+<h2>
+<a href="#intro">Introduction</a>
+</h2>
+<p>To create your own content, edit the file at
+<code>docs/md/99-Intro.md</code> and add more <code>.md</code> files in
+the <code>docs/md/</code> folder.</p>
+<p>See <a
+href="https://htm-elves.github.io/Writing-Your-Own-Tutorials/">Writing
+Your Own Tutorials</a> for tips and shortcuts.</p>
+</section>
+
+<div class="spacer"></div>
+<footer id="content-footer">
+<button type="button" class="previous" disabled>
+  <img src="../public/svg/prev.svg" alt="prev" draggable="false">
+</button>
+<span class="previous-name"></span>
+<span class="spacer"></span>
+<button type="button" class="next">
+  <img src="../public/svg/next.svg" alt="next" draggable="false">
+</button>
+<span class="next-name"></span>
+</footer>
+</main>
+
+<nav
+id="menu"
+aria-labelledby="menu"
+class="open"
+>
+<div class="theme">
+  <label
+  title="Dark"
+  >
+  <img src="../public/svg/dark.svg" alt="dark">
+  <input
+  type="radio"
+  name="theme"
+  id="theme-dark"
+  checked
+  >
+  </label>
+  <label
+  title="Light"
+  >
+  <img src="../public/svg/light.svg" alt="light">
+  <input
+  type="radio"
+  name="theme"
+  id="theme-light"
+  >
+  </label>
+  </div>
+  <div class="paging">
+  <label
+  title="Split into sections"
+  >
+  <img src="../public/svg/pages.svg" alt="pages">
+  <input
+  type="radio"
+  name="paging"
+  id="pages"
+  checked
+  >
+  </label>
+  <label
+  title="Show as a single page"
+  >
+  <img src="../public/svg/scroll.svg" alt="scroll">
+  <input
+  type="radio"
+  name="paging"
+  id="scroll"
+  >
+  </label>
+  </div>
+<img src="../public/svg/hamburger.svg" alt="menu" id="menu-icon">
+
+<ul id="menu-items">
+</ul>
+<div id="repo">
+<a
+href="https://github.com/MERNCraft/SplitSpans/issues/new"
+>
+Feedback
+</a>
+
+<a
+class="repo"
+href="https://github.com/MERNCraft/SplitSpans"
+>
+<img src="../public/svg/github.svg" alt="github logo">
+<span>GitHub repository</span>
+</a>
+</div>
+</nav>
+</body>
+</html>
