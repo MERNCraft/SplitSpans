@@ -39,69 +39,28 @@ content="width=device-width, initial-scale=1.0"
   <span class="next-name"></span>
 </nav>
 
+<!-- Getting Started -->
+<section id="getting-started" aria-labelledby="getting-started" data-item="Getting Started">
+<h2>
+<a href="#getting-started">Getting Started</a>
+</h2>
+</section>
 <section id="intro" aria-labelledby="intro" data-item="Introduction">
 <h2>
 <a href="#intro">Introduction</a>
 </h2>
-<p>I recently needed to find a simple way to select text on a web page,
-ensuring that selections start and end with a whole word, and this
-regardless of language or writing system, or how the HTML text was
-formatted.</p>
-<blockquote>
-<p>❌ This is wh<span style="background-color: #960">at I wanted
-</span>to avoid.</p>
-<p>✅ This is <span style="background-color: #960">what I wanted</span>
-to achieve.</p>
-</blockquote>
-<p>In European languages, spaces are used to separate words. But this is
-not true for all Asian languages. In Thai, for instance, consonants and
-vowels are written in a continuous stream, with spaces used to indicate
-the end of a sentence. My knowledge of Thai is limited. I needed help to
-find where words in Thai begin and end.</p>
-<blockquote>
-<p>❌ นี่คือสิ่งที่ฉันไม่อยาก<span style="background-color:#960">ใหเ
-กิดขึ้</span>น</p>
-<p>✅ นี่คือสิ่งที่ฉันไม่อยาก<span
-style="background-color:#960">ให้เกิดขึ้น</span></p>
-</blockquote>
-<p>Enter <a
-href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter">Intl.Segmenter</a>,
-a relatively new JavaScript feature that is now widely available in
-browsers everywhere.</p>
-<p>To understand how selection works in a browser and what
-Intl.Segmenter does, what better way is there than to write a tutorial
-(for you, and for my future self) about it.</p>
-<h3 id="why-might-you-want-to-read-this">Why might you want to read
-this?</h3>
-<p>If you are building a tool involving text selection, editing,
-annotation, subtitles, or multilingual text handling, this tutorial
-might be helpful for you, for tasks like: like:</p>
-<ul>
-<li>Snapping selections to whole words</li>
-<li>Handling selection that begins in whitespace</li>
-<li>Distinguishing punctuation vs typographic spaces</li>
-<li>Extracting the right boundaries for DOM splitting</li>
-<li>Supporting multilingual text in the browser</li>
-</ul>
-<p>Use cases might include:</p>
-<ul>
-<li>A collaborative writing environment like a Google Docs clone</li>
-<li>An ebook reader, where user can look up words in a dictionary</li>
-<li>An annotation tool for speeches, lyrics or poetry</li>
-<li>An assisted reading tool</li>
-<li>A language learning app</li>
-</ul>
-<p>Does this sound like something you are doing? If so, read on…</p>
+<iframe id="demo" title="demo" width="600" height="300" src="https://merncraft.github.io/SplitSpansDemo/">
+</iframe>
 <details class="tldr">
 <summary>
-TL;DR: Why do I need to do this?
+TL;DR: My personal use case
 </summary>
 <p>I teach English as a foreign language to adults. I have friends who
 teach their own native languages, to adults and to children. A big
 question that we have is: “How to make learners want to spend time
 practising their new language?” One way is to get them to watch films in
-their target language. Or perhaps better yet (and free): YouTube videos
-on subjects that interest them.</p>
+their target language. Or perhaps better yet (and free): get them to
+watch short YouTube videos on subjects that interest them.</p>
 <h3 id="youtube-auto-generated-transcripts">YouTube auto-generated
 transcripts</h3>
 <p>Many YouTube videos provide subtitles, and an interactive transcript.
@@ -143,8 +102,8 @@ the words.</p>
 make a sound like “Sgonnbegooh!” It can take a learner a little time to
 get used to the shortcuts native speakers make, that other native
 speakers can easily understand.</p>
-<p>So, before making my “Learn a language through YouTube”, I had to
-make myself a tool that would allow me to:</p>
+<p>So, before releasing my “Learn a language through YouTube” app, I had
+to make myself a tool that would allow me to:</p>
 <ul>
 <li>Paste a YouTube URL</li>
 <li>Automatically download the transcript</li>
@@ -161,7 +120,7 @@ order.</li>
 <li>Export the subtitles in the standard SRT format, to be used by my
 “Learn a language through YouTube” app.</li>
 </ul>
-<p>Hence the need to split, merge and edit the text of HTML spans, as
+<p>Hence the need to split and merge the text of HTML spans, as
 described in this tutorial.</p>
 <p>You can find the Subtitle Optimizer tool <a href="">here</a>, and the
 “Learn a language through YouTube” app <a
@@ -170,8 +129,8 @@ href="https://stv.jazyx.com">here</a>.</p>
 <h3 id="fun-fact">Fun Fact</h3>
 <p>One advantage of watching YouTube videos embedded in third-party site
 is that <strong>the videos are never interrupted by ads</strong>.</p>
-<p>And yes, I have contacted the content creators who videos I link to,
-to make sure that they are happy that their work is used in this
+<p>And yes, I contact the content creators whose videos I link to, to
+make sure that they are happy that their work is used in this
 educational manner, even if it means that they don’t earn any ad revenue
 from it.</p>
 </blockquote>

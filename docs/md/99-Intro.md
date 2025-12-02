@@ -12,49 +12,18 @@ repo: SplitSpans
 >
   <h2><a href="#intro">Introduction</a></h2>
 
-I recently needed to find a simple way to select text on a web page, ensuring that selections start and end with a whole word, and this regardless of language or writing system, or how the HTML text was formatted.
-
-> ❌ This is wh<span style="background-color: #960">at I wanted </span>to avoid.
-> 
-> ✅ This is <span style="background-color: #960">what I wanted</span> to achieve.
-
-In European languages, spaces are used to separate words. But this is not true for all Asian languages. In Thai, for instance, consonants and vowels are written in a continuous stream, with spaces used to indicate the end of a sentence. My knowledge of Thai is limited. I needed help to find where words in Thai begin and end.
-
-> ❌ นี่คือสิ่งที่ฉันไม่อยาก<span style="background-color:#960">ใหเ กิดขึ้</span>น
-> 
-> ✅ นี่คือสิ่งที่ฉันไม่อยาก<span style="background-color:#960">ให้เกิดขึ้น</span>
-
-
-Enter [Intl.Segmenter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter), a relatively new JavaScript feature that is now widely available in browsers everywhere.
-
-To understand how selection works in a browser and what Intl.Segmenter does, what better way is there than to write a tutorial (for you, and for my future self) about it.
-
-### Why might you want to read this?
-
-If you are building a tool involving text selection, editing, annotation, subtitles, or multilingual text handling, this tutorial might be helpful for you, for tasks like:
-like:
-
-* Snapping selections to whole words
-* Handling selection that begins in whitespace
-* Distinguishing punctuation vs typographic spaces
-* Extracting the right boundaries for DOM splitting
-* Supporting multilingual text in the browser
-
-Use cases might include:
-
-* A collaborative writing environment like a Google Docs clone
-* An ebook reader, where user can look up words in a dictionary
-* An annotation tool for speeches, lyrics or poetry
-* An assisted reading tool
-* A language learning app
-
-Does this sound like something you are doing? If so, read on...
-
+<iframe
+  id="demo"
+  title="demo"
+  width="600"
+  height="300"
+  src="https://merncraft.github.io/SplitSpansDemo/">
+</iframe>
 
 <details class="tldr">
-<summary>TL;DR: Why do I need to do this?</summary>
+<summary>TL;DR: My personal use case</summary>
 
-I teach English as a foreign language to adults. I have friends who teach their own native languages, to adults and to children. A big question that we have is: "How to make learners want to spend time practising their new language?" One way is to get them to watch films in their target language. Or perhaps better yet (and free): YouTube videos on subjects that interest them.
+I teach English as a foreign language to adults. I have friends who teach their own native languages, to adults and to children. A big question that we have is: "How to make learners want to spend time practising their new language?" One way is to get them to watch films in their target language. Or perhaps better yet (and free): get them to watch short YouTube videos on subjects that interest them.
 
 ### YouTube auto-generated transcripts
  Many YouTube videos provide subtitles, and an interactive transcript. You can show the subtitles by clicking on the `Subtitles/closed caption` button in the YouTube toolbar, and you can show the transcript by ...
@@ -79,7 +48,7 @@ I teach English as a foreign language to adults. I have friends who teach their 
 
  A subtitle might say: "It's going to be good!" but the speaker might make a sound like "Sgonnbegooh!" It can take a learner a little time to get used to the shortcuts native speakers make, that other native speakers can easily understand.
 
- So, before making my "Learn a language through YouTube", I had to make myself a tool that would allow me to:
+ So, before releasing my "Learn a language through YouTube" app, I had to make myself a tool that would allow me to:
 
 * Paste a YouTube URL
 * Automatically download the transcript
@@ -91,14 +60,14 @@ I teach English as a foreign language to adults. I have friends who teach their 
 * Provide the translator with some flexibility about subtitle timing, as different languages give the same information in a different order.
 * Export the subtitles in the standard SRT format, to be used by my "Learn a language through YouTube" app.
 
-Hence the need to split, merge and edit the text of HTML spans, as described in this tutorial.
+Hence the need to split and merge the text of HTML spans, as described in this tutorial.
 
 You can find the Subtitle Optimizer tool [here](), and the "Learn a language through YouTube" app [here](https://stv.jazyx.com).
 
 > ### Fun Fact
 > One advantage of watching YouTube videos embedded in third-party site is that **the videos are never interrupted by ads**.
 > 
-> And yes, I have contacted the content creators who videos I link to, to make sure that they are happy that their work is used in this educational manner, even if it means that they don't earn any ad revenue from it.
+> And yes, I contact the content creators whose videos I link to, to make sure that they are happy that their work is used in this educational manner, even if it means that they don't earn any ad revenue from it.
 
 </details>
 
