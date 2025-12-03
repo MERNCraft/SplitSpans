@@ -39,11 +39,316 @@ content="width=device-width, initial-scale=1.0"
   <span class="next-name"></span>
 </nav>
 
-<!-- Getting Started -->
-<section id="getting-started" aria-labelledby="getting-started" data-item="Getting Started">
+<!-- The Selection Object -->
+<section id="the-selection-object" aria-labelledby="the-selection-object" data-item="The Selection Object">
 <h2>
-<a href="#getting-started">Getting Started</a>
+<a href="#the-selection-object">The Selection Object</a>
 </h2>
+<p>I’ll start by introducing two leading characters in the story that
+will unfold: the Selection and the Range object.</p>
+<h3 id="the-selection-object">The Selection object</h3>
+<p>From the moment you launch a web page, the browser window has a <a
+href="https://developer.mozilla.org/en-US/docs/Web/API/Selection">Selection</a>
+object, which JavaScript gives you access to. The official way to talk
+to it is as <code>window.getSelection()</code>, but throughout this
+tutorial, I will be assigning this to a variable, so you can call it
+<code>selection</code>, for short.</p>
+<p>When you drag to select an image or some text in a web page, the
+<code>selection</code> updates internally, to reflect whatever is
+currently selected. When you select text, the plain text version of what
+you selected is available through <code>selection.toString()</code>.
+Indeed, if you just <code>console.log(selection)</code>, what you will
+see is a string of plain text (or perhaps an empty string, if no text is
+selected.)</p>
+<h3 id="the-range-object">The Range object</h3>
+<p>Each selected section is in fact stored in a <a
+href="https://developer.mozilla.org/en-US/docs/Web/API/Range">Range</a>
+object. In browsers that support multiple Range objects, there can be
+many separate selected areas on the page.</p>
+<h3 id="selective-vision">Selective Vision?</h3>
+<p>However, the Selection object does not have access to everything that
+you see on a page. For example, <code>selection</code> has no access
+to:</p>
+<ul>
+<li>Pseudo-elements, like <code>::before</code> or <code>::after</code>,
+or any <code>::marker</code> for a list item</li>
+<li>The text of <code>&lt;input&gt;</code> elements,
+<code>&lt;select&gt;</code> elements and <code>&lt;textarea&gt;</code>
+elements</li>
+<li>Any elements with a CSS styling of
+<code>user-select: none</code>.</li>
+</ul>
+<p>The selection <strong>can</strong> however contain formatting tags
+and their content, like
+<code>This chunk with &lt;i&gt;italic&lt;/i&gt; text.</code>
+<strong>Note</strong> that <code>selection.toString()</code> will show
+only plain text, even if the <code>selection</code> does in fact hold
+formatted text.</p>
+<h3 id="see-for-yourself">See for yourself</h3>
+<p>To get an idea of what <code>selection</code> can and cannot see,
+click and drag to make some selections in the demo below, and watch how
+the text in the grey feedback zone changes.</p>
+<iframe id="selection-and-range" title="Selection and Range" width="480" height="360" src="https://merncraft.github.io/SelectionAndRange/">
+</iframe>
+<p>Try selecting different parts of the page:</p>
+<ul>
+<li>The text at the top</li>
+<li>The emoji</li>
+<li>Both lines of text together</li>
+<li>The words “DIV”</li>
+<li>The image</li>
+<li>The text in italics… and some text to either side of it</li>
+<li>The text in the input field</li>
+<li>The text in the grey feedback zone that displays what the Selection
+object is aware of</li>
+<li>The entire contents of the page</li>
+</ul>
+<p>Also, try simply clicking somewhere in the text without making any
+selection.</p>
+<p>You can find the full</p>
+<details class="solution">
+<summary>
+Try this at home
+</summary>
+<p>To create the same demo on your own computer, you can clone the <a
+href="https://github.com/MERNCraft/SelectionAndRange">GitHub
+repository</a>, or follow the instructions below.</p>
+<ol type="1">
+<li>Greate a file called <code>index.html</code></li>
+<li>Copy and paste the HTML shown below into it</li>
+<li>Open the file in your Browser</li>
+</ol>
+<pre class="language-html line-numbers"><code class="language-html line-numbers">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;title&gt;getSelection&lt;/title&gt;
+  &lt;style&gt;
+    pre {
+      background-color: #ccc;
+      min-height: 1em;
+    }
+    div::before {
+      content: "DIV &gt;&gt;&gt;"
+    }
+    div::after {
+      content: "&lt;&lt;&lt; DIV"
+    }
+    #feedback {
+      -webkit-user-select: none;
+      user-select: none;
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;p id="one"&gt;Click and drag       to make a selection 👍🏼&lt;/p&gt;
+  &lt;p id="two"&gt;Your selection can <i>start</i> on one line and <i>end</i> on another.&lt;/p&gt;
+  &lt;div&gt;
+    &lt;img src="https://picsum.photos/32/32" alt="picsum image"&gt;
+  &lt;/div&gt;
+  &lt;input type="text" placeholder="text input"&gt;
+  &lt;pre id="feedback"&gt;&lt;/pre&gt;
+
+  &lt;script&gt;
+    const feedback = document.getElementById("feedback")
+    document.body.addEventListener("mousemove", showSelection)
+    document.body.addEventListener("mouseup", showSelection)
+
+    function showSelection() {
+      const selection = window.getSelection()
+      if (!selection.rangeCount) {
+        feedback.innerText = "selection.rangeCount: 0"
+        return
+      }
+
+      const range = selection.getRangeAt(0)
+
+      const start = range.startContainer
+      const startName = start.nodeName
+      let startParent = range.startContainer.parentElement
+      let id = startParent.id
+      startParent = startParent.tagName.toLowerCase()
+                  + (id ? `#${id}` : "")
+
+      const end = range.endContainer
+      const endName = end.nodeName
+      let endParent = range.endContainer.parentElement
+      id = endParent.id
+      endParent = endParent.tagName.toLowerCase()
+                + (id ? `#${id}` : "")
+      
+      feedback.innerText = `'${selection}'
+range.startContainer.nodeName:      ${startName}
+range.startContainer.parentElement: ${startParent}
+range.startOffset:                  ${range.startOffset}
+
+range.endContainer.nodeName:        ${endName}
+range.endContainer.parentElement:   ${endParent}
+range.endOffset:                    ${range.endOffset}`
+    }
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</details>
+<h3 id="observing-the-selection-and-its-range-object">Observing the
+Selection and its Range object</h3>
+<p>The window’s Selection object is created as soon as the page loads.
+As you can see in the script of your HTML page, you can get a pointer to
+it using <code>window.getSelection()</code>.</p>
+<p>If there is something selected on the page, the Selection object will
+have at least one Range object. But as the next image shows, when the
+page is first loaded, before the first click, nothing is selected, and
+the selection has no Range objects to share. Its <code>rangeCount</code>
+is initially zero.</p>
+<pre class="language-js line-numbers" data-start="37"><code class="language-js line-numbers">const selection = window.getSelection()
+if (!selection.rangeCount) {
+  feedback.innerText = "selection.rangeCount: 0"
+  return
+}</code></pre>
+<figure>
+<img src="images/just_loaded.webp" alt="Page just loaded" />
+<figcaption aria-hidden="true">Page just loaded</figcaption>
+</figure>
+<h3 id="best-supporting-roles">Best Supporting Roles…</h3>
+<p>If you double-click on the word ‘Click’ or click and drag to select
+it, you’ll see in the grey feedback zone that a Range object is created.
+It has four properties that you will be using a lot:</p>
+<ul>
+<li><code>startContainer</code></li>
+<li><code>startOffset</code></li>
+<li><code>endContainer</code></li>
+<li><code>endOffset</code></li>
+</ul>
+<figure>
+<img src="images/click_selected.webp"
+alt="Selecting the word ‘Click’" />
+<figcaption aria-hidden="true">Selecting the word ‘Click’</figcaption>
+</figure>
+<p>You might have two surprises here. First, the range mentions <em>two
+container</em> objects: <code>startContainer</code> and
+<code>endContainer</code>, although you know that the word ‘Click’ is
+entirely contained in one <code>&lt;p&gt;</code> element. Second, both
+the <em>nodeName</em> of both the <code>startContainer</code> and the
+<code>endContainer</code> is given as <code>#text</code>, not as
+<code>&lt;p&gt;</code>. The element you created as
+<code>&lt;p id="one"&gt;</code> is shown as the
+<code>range.startContainer.parentElement</code>.</p>
+<p>You can see the <code>parentElement</code>’s full title and more
+details of the range object, if you place a breakpoint in the
+Debugger:</p>
+<figure>
+<img src="images/breakpoint.webp"
+alt="Add a breakpoint after the range variable is set…" />
+<figcaption aria-hidden="true">Add a breakpoint after the range variable
+is set…</figcaption>
+</figure>
+<figure>
+<img src="images/debugging_range.webp"
+alt="…then observe the range object in the Debugger" />
+<figcaption aria-hidden="true">…then observe the range object in the
+Debugger</figcaption>
+</figure>
+<h3 id="whats-a-text-node">What’s a #text node?</h3>
+<p>An HTML element, like a <code>&lt;p&gt;</code> element, can contain
+more than just text. It can also contain inline content elements like
+<code>&lt;img&gt;</code>, <code>&lt;input&gt;</code> or
+<code>&lt;select&gt;</code>, or inline formatting elements like
+<code>&lt;i&gt;</code> and <code>&lt;b&gt;</code>. Everything between
+these inline elements, and all text inside them, is treated as a
+<code>text node</code>. Even the gaps between HTML elements in the HTML
+page are considered to be text nodes. Here’s an example. All the
+highlighted characters in the HTML code below are in text nodes,
+including the invisible spaces and carriage returns.</p>
+<pre class="language-html"><code class="language-html"><i>&lt;p&gt;<u>↵
+  </u>&lt;span&gt;<u>text node in a child span</u>&lt;/span&gt;<u>↵
+  text node in the top-level paragraph↵</u>
+&lt;/p&gt;</i></code></pre>
+<details class="alert" open>
+<summary>
+White space
+</summary>
+<p>By default, all consecutive white space in text nodes is collapsed
+into a single space (<code></code>) character, so you may not be aware
+of how much white space there actually is. But you’ll need to pay
+attention: soon you’ll be having to count every last white space
+character, if you want to get your text selection tool to work well.</p>
+<p>Notice, for example, how this line in your HTML file contains many
+spaces between “drag” and “to”…</p>
+<pre class="language-html line-numbers" data-start="72"><code class="language-html line-numbers">&lt;p id="one"&gt;Click and drag       to make a selection 👍🏼&lt;/p&gt;</code></pre>
+<p>… but this line in the rendered page shows only one:<br><br></p>
+<figure>
+<img src="images/one_space.webp"
+alt="Only one space rendered between “drag” and “to”" />
+<figcaption aria-hidden="true">Only one space rendered between “drag”
+and “to”</figcaption>
+</figure>
+</details>
+<h3 id="startoffset-and-endoffset">startOffset and endOffset</h3>
+<p>When the word ‘Click’ is selected, the <code>startOffset</code> is
+<code>0</code> while the <code>endOffset</code> is set to
+<code>5</code>.</p>
+<p>You should be used to JavaScript counting from 0. Here, it is saying
+that your selection starts when there are 0 characters to the left, and
+it ends after the 5-letter word ‘Click’, when there are 5 characters to
+the left.</p>
+<p>On the page, the distance between the start of the letter “g” in
+“drag” and the end of the letter “t” in “two”, looks like it should give
+an offset difference of <code>3</code>, but the <code>range</code>
+object is looking at the source HTML, and it keeps a different
+score:</p>
+<figure>
+<img src="images/22-13.webp"
+alt="One visual space can be many HTML white space characterss" />
+<figcaption aria-hidden="true">One visual space can be many HTML white
+space characterss</figcaption>
+</figure>
+<figure>
+<img src="images/emoji_selected.webp"
+alt="An emoji can count as several characters" />
+<figcaption aria-hidden="true">An emoji can count as several
+characters</figcaption>
+</figure>
+<figure>
+<img src="images/image_selected.webp"
+alt="The alt text of an image as seen by Selection" />
+<figcaption aria-hidden="true">The alt text of an image as seen by
+Selection</figcaption>
+</figure>
+<figure>
+<img src="images/two_lines.webp"
+alt="When startContainer and endContainer are different" />
+<figcaption aria-hidden="true">When startContainer and endContainer are
+different</figcaption>
+</figure>
+<figure>
+<img src="images/start_in_i_tag.webp"
+alt="Container.parentElements of different types" />
+<figcaption aria-hidden="true">Container.parentElements of different
+types</figcaption>
+</figure>
+<figure>
+<img src="images/input_selected.webp"
+alt="Text that can’t be selected by Selection" />
+<figcaption aria-hidden="true">Text that can’t be selected by
+Selection</figcaption>
+</figure>
+<figure>
+<img src="images/all_selected.webp"
+alt="Everything on the page is “selected”… or is it?" />
+<figcaption aria-hidden="true">Everything on the page is “selected”… or
+is it?</figcaption>
+</figure>
+<figure>
+<img src="images/all_deselected.webp"
+alt="A click to the right of the input field: no text selected" />
+<figcaption aria-hidden="true">A click to the right of the input field:
+no text selected</figcaption>
+</figure>
+<figure>
+<img src="images/invisible_caret.webp"
+alt="A click collapses the Selection to an invisible caret" />
+<figcaption aria-hidden="true">A click collapses the Selection to an
+invisible caret</figcaption>
+</figure>
 </section>
 <section id="intro" aria-labelledby="intro" data-item="Introduction">
 <h2>
@@ -51,6 +356,177 @@ content="width=device-width, initial-scale=1.0"
 </h2>
 <iframe id="demo" title="demo" width="600" height="300" src="https://merncraft.github.io/SplitSpansDemo/">
 </iframe>
+<h3 id="whats-in-store-for-you">What’s in Store for You</h3>
+<h4 id="part-1-selection">Part 1: Selection</h4>
+<ol type="1">
+<li>window.getSelection()</li>
+</ol>
+<ul>
+<li>What it returns (a Selection object)</li>
+<li>Multiple ranges? (selection.rangeCount)</li>
+<li>Basic usage examples (toString(), getRangeAt(0))</li>
+</ul>
+<ol start="2" type="1">
+<li>The Range object</li>
+</ol>
+<ul>
+<li>Properties: startContainer, startOffset, endContainer, endOffset,
+commonAncestorContainer</li>
+<li>Methods: selectNode, selectNodeContents, setStart, setEnd,
+cloneRange</li>
+<li>Why you often want a Range instead of just the selection string</li>
+</ul>
+<ol start="3" type="1">
+<li>Text nodes vs element nodes</li>
+</ol>
+<ul>
+<li>What a text node is (nodeType === 3)</li>
+<li>How inline elements affect selections (<code>&lt;b&gt;</code>,
+<code>&lt;i&gt;</code>, <code>&lt;span&gt;</code>)</li>
+<li>Why startContainer can be a text node or an element (Safari
+quirk)</li>
+<li>Using childNodes to inspect the DOM structure</li>
+</ul>
+<ol start="4" type="1">
+<li>Selection offsets</li>
+</ol>
+<ul>
+<li>Offsets relative to the container (text node vs element)</li>
+<li>Why startOffset and endOffset may not correspond to visible
+characters exactly (whitespace, hidden nodes, zero-length nodes)</li>
+<li>Common mistakes when computing offsets directly
+<ul>
+<li>Treating offsets as global visible positions</li>
+<li>Assuming containers are always text nodes</li>
+<li>Forgetting that whitespace rules affect selectable characters</li>
+<li>Not accounting for invisible/empty text nodes</li>
+<li>Treating endOffset as inclusive</li>
+<li>Misunderstanding UTF-16 vs grapheme clusters</li>
+<li>Using textContent.length as if spans were one node</li>
+<li>Misinterpreting backwards selections</li>
+<li>Mutating the DOM before preserving Range info</li>
+</ul></li>
+</ul>
+<ol start="5" type="1">
+<li>Browser differences</li>
+</ol>
+<ul>
+<li>Safari quirks:</li>
+<li>startContainer may be in a previous element’s text node</li>
+<li>Selections may “snap” across inline boundaries</li>
+<li>Chrome/Firefox generally behave consistently</li>
+<li>Implications for algorithms that rely on DOM offsets</li>
+</ul>
+<ol start="6" type="1">
+<li>Clamping / normalizing selections</li>
+</ol>
+<ul>
+<li>Concept: adjusting startContainer and endContainer to the
+“first/last selectable text node” in the intended range</li>
+<li>Why this is needed before doing any text manipulation or
+word-boundary expansion</li>
+<li>Example: “Snap selection start to 0 offset of first text node inside
+element”</li>
+</ul>
+<ol start="7" type="1">
+<li>Traversing selected text</li>
+</ol>
+<ul>
+<li>Why you need to iterate all text nodes between startContainer and
+endContainer</li>
+<li>Introduce TreeWalker or NodeIterator for walking the DOM</li>
+<li>Differences between childNodes iteration vs TreeWalker (nested
+inline elements)</li>
+</ul>
+<ol start="9" type="1">
+<li>Handling whitespace white-space CSS affects what is visually
+selectable</li>
+</ol>
+<ul>
+<li>pre-wrap vs normal vs nowrap</li>
+<li>How this affects offset calculations</li>
+<li>Note: pseudo-elements (::before, ::after) are ignored because they
+aren’t selectable</li>
+</ul>
+<ol start="9" type="1">
+<li>Edge cases and best practices</li>
+</ol>
+<ul>
+<li>Empty elements or elements with no text nodes</li>
+<li>Nested inline elements (<b><i>text</i></b>)</li>
+<li>Collapsed nodes or nodes with only whitespace</li>
+<li>Using Range.compareBoundaryPoints to detect containment</li>
+</ul>
+<ol start="10" type="1">
+<li>Topics to explore further</li>
+</ol>
+<ul>
+<li>Using range.getClientRects() for visual selection bounds</li>
+<li>Multi-range selections (rare, but good to mention)</li>
+<li>How selection APIs interact with contenteditable areas</li>
+<li>Selection normalization strategies from popular editors
+(ProseMirror, Slate)</li>
+</ul>
+<h4 id="part-2-detecting-word-boundaries">Part 2: Detecting word
+boundaries</h4>
+<ol type="1">
+<li>How browser understand word boundaries</li>
+<li>Intl.Segmenter basics</li>
+<li>Mapping segmenter offsets back to the DOM</li>
+<li>Working no-break characters</li>
+<li>Language-specific rules for punctuation</li>
+<li>Boundaries around inline formatting</li>
+<li>Identifying blocks that should not be broken</li>
+<li>Words that span DOM nodes, for whatever reason</li>
+<li>Special case: Speaker change em-dash for subtitles</li>
+</ol>
+<h4 id="part-3-splitting-and-merging-elements">Part 3: Splitting and
+merging elements</h4>
+<ol type="1">
+<li>How Range mutations work</li>
+<li>Splitting text nodes and inline structures</li>
+<li>Extracting content with extractContents()</li>
+<li>Safe merging: style checks, tagName checks</li>
+<li>Wrapping selection in spans</li>
+<li>Avoiding nested span hell</li>
+<li>Removing/redesigning wrappers</li>
+<li>Adding a class to new spans</li>
+</ol>
+<h4 id="mini-projects">Mini Projects</h4>
+<ul>
+<li><p>Project 1: Basic selection Single text node, no formatting Goal:
+get selected text and offsets</p></li>
+<li><p>Project 2: Inline formatting <code>&lt;b&gt;</code> or
+<code>&lt;i&gt;</code> inside text Goal: understand startContainer and
+endContainer with nested tags</p></li>
+<li><p>Project 3: Multi-span selection Two adjacent
+<code>&lt;span&gt;</code> elements Goal: see how selection crosses
+elements, offsets are computed</p></li>
+<li><p>Project 4: Whitespace handling Show white-space: pre-wrap vs
+normal Goal: see which characters are actually selectable</p></li>
+</ul>
+<p>Project 5: Safari quirk Cross-span startContainer issue Goal:
+understand why clamping/normalization is needed</p>
+<ul>
+<li><p>Project 6: Introduction to TreeWalker Walk selected text nodes,
+accumulate text Goal: show how to reliably collect selected
+text</p></li>
+<li><p>Project 7: Selection clamping Normalize selection start/end to
+first/last text node Goal: ready for word-boundary expansion in Part
+2</p></li>
+</ul>
+<hr />
+<ul>
+<li>Whole-word expansion</li>
+<li>Splitting text out of existing spans</li>
+<li>Splitting <code>&lt;b&gt;</code>, <code>&lt;i&gt;</code>, etc. at
+selection boundaries</li>
+<li>Creating a new span exactly around the selection</li>
+<li>Merging neighboring spans when appropriate</li>
+<li>Normalizing Safari’s misaligned selection containers</li>
+<li>DOM text walking</li>
+<li>Range manipulation</li>
+</ul>
 <details class="tldr">
 <summary>
 TL;DR: My personal use case
