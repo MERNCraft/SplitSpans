@@ -44,8 +44,25 @@ content="width=device-width, initial-scale=1.0"
 <h2>
 <a href="#the-selection-object">The Selection Object</a>
 </h2>
+<p>Before you can master a field of knowledge, you need to be able
+create clear mental images, which are not too different from the reality
+that you need to deal with. One good way to do this is with hands-on
+manipulation, where you can get immediate feedback on the effect of the
+changes that you make.</p>
 <p>I’ll start by introducing two leading characters in the story that
-will unfold: the Selection and the Range object.</p>
+will unfold: the <a
+href="https://developer.mozilla.org/en-US/docs/Web/API/Selection">Selection</a>
+and the <a
+href="https://developer.mozilla.org/en-US/docs/Web/API/Range">Range</a>
+object. And then I’ll show you the interplay between them and their
+supporting cast: <a
+href="https://developer.mozilla.org/en-US/docs/Web/API/Range/startContainer">range.startContainer</a>
+with its companion <a
+href="https://developer.mozilla.org/en-US/docs/Web/API/Range/startOffset">range.startOffset</a>,
+together with <a
+href="https://developer.mozilla.org/en-US/docs/Web/API/Range/endContainer">range.endContainer</a>
+with its companion <a
+href="https://developer.mozilla.org/en-US/docs/Web/API/Range/endOffset">range.endOffset</a>.</p>
 <h3 id="the-selection-object">The Selection object</h3>
 <p>From the moment you launch a web page, the browser window has a <a
 href="https://developer.mozilla.org/en-US/docs/Web/API/Selection">Selection</a>
@@ -60,6 +77,7 @@ you selected is available through <code>selection.toString()</code>.
 Indeed, if you just <code>console.log(selection)</code>, what you will
 see is a string of plain text (or perhaps an empty string, if no text is
 selected.)</p>
+<p>This is what is showen at the top of grey feedback section</p>
 <h3 id="the-range-object">The Range object</h3>
 <p>Each selected section is in fact stored in a <a
 href="https://developer.mozilla.org/en-US/docs/Web/API/Range">Range</a>
@@ -88,7 +106,7 @@ formatted text.</p>
 <p>To get an idea of what <code>selection</code> can and cannot see,
 click and drag to make some selections in the demo below, and watch how
 the text in the grey feedback zone changes.</p>
-<iframe id="selection-and-range" title="Selection and Range" width="480" height="360" src="https://merncraft.github.io/SelectionAndRange/">
+<iframe id="selection-and-range" title="Selection and Range" width="480" height="480" src="https://merncraft.github.io/SelectionAndRange/">
 </iframe>
 <p>Try selecting different parts of the page:</p>
 <ul>
@@ -105,10 +123,14 @@ object is aware of</li>
 </ul>
 <p>Also, try simply clicking somewhere in the text without making any
 selection.</p>
-<p>You can find the full</p>
+<blockquote>
+<p>You can find the full script of this demo in the <em>Try This at
+Home</em> section below. I’ll be quoting extracts of the script in what
+follows, so that you can see how the code works.</p>
+</blockquote>
 <details class="solution">
 <summary>
-Try this at home
+Try This at Home
 </summary>
 <p>To create the same demo on your own computer, you can clone the <a
 href="https://github.com/MERNCraft/SelectionAndRange">GitHub
@@ -123,40 +145,79 @@ repository</a>, or follow the instructions below.</p>
 &lt;head&gt;
   &lt;title&gt;getSelection&lt;/title&gt;
   &lt;style&gt;
+    body {
+      color: #ddd;
+      background-color: #111;
+    }
+    div#image {
+      text-align: center;
+      img {
+        vertical-align: middle;
+      }
+      &::before {
+        content: "::before\00a0\00a0";
+      }
+      &::after {
+        content: "\00a0\00a0::after"
+      }
+    }
+    input {
+      margin: 1em 0;
+      width: 100%;
+    }
     pre {
-      background-color: #ccc;
+      background-color: #333;
       min-height: 1em;
+      margin-top: 0;
+      white-space: pre-wrap;
     }
-    div::before {
-      content: "DIV &gt;&gt;&gt;"
-    }
-    div::after {
-      content: "&lt;&lt;&lt; DIV"
-    }
-    #feedback {
+    pre,
+    .feedback {
       -webkit-user-select: none;
       user-select: none;
+
+      & span {
+        display: inline-block;
+        font-family: monospace;
+        text-decoration: underline;
+        width: 100%;
+        text-align: center;
+      }
     }
   &lt;/style&gt;
 &lt;/head&gt;
 &lt;body&gt;
   &lt;p id="one"&gt;Click and drag       to make a selection 👍🏼&lt;/p&gt;
   &lt;p id="two"&gt;Your selection can <i>start</i> on one line and <i>end</i> on another.&lt;/p&gt;
-  &lt;div&gt;
-    &lt;img src="https://picsum.photos/32/32" alt="picsum image"&gt;
+  &lt;div id="image"&gt;
+    &lt;img
+      src="https://picsum.photos/48/48"
+      alt="random image from https://picsum.photos/48/48"
+    &gt;
   &lt;/div&gt;
   &lt;input type="text" placeholder="text input"&gt;
-  &lt;pre id="feedback"&gt;&lt;/pre&gt;
+  &lt;div class="feedback"&gt;
+    &lt;span&gt;selection.toString()&lt;/span&gt;
+    &lt;pre id="selection"&gt;&lt;/pre&gt;
+  &lt;/div&gt;
+  &lt;div class="feedback"&gt;
+    &lt;span&gt;selection.getRangeAt(0)&lt;/span&gt;
+    &lt;pre id="range"&gt;&lt;/pre&gt;
+  &lt;/div&gt;
 
   &lt;script&gt;
-    const feedback = document.getElementById("feedback")
-    document.body.addEventListener("mousemove", showSelection)
-    document.body.addEventListener("mouseup", showSelection)
+    let ii = 0
+    const selectionP = document.getElementById("selection")
+    const rangeP = document.getElementById("range")
+
+    const selection = window.getSelection()
+
+    setInterval(showSelection, 100)
 
     function showSelection() {
-      const selection = window.getSelection()
       if (!selection.rangeCount) {
-        feedback.innerText = "selection.rangeCount: 0"
+        selectionP.innerText = "selection.rangeCount: 0"
+        rangeP.innerText = ""
         return
       }
 
@@ -175,9 +236,11 @@ repository</a>, or follow the instructions below.</p>
       id = endParent.id
       endParent = endParent.tagName.toLowerCase()
                 + (id ? `#${id}` : "")
-      
-      feedback.innerText = `'${selection}'
-range.startContainer.nodeName:      ${startName}
+
+      selectionP.innerText = selection
+
+      rangeP.innerText =
+`range.startContainer.nodeName:      ${startName}
 range.startContainer.parentElement: ${startParent}
 range.startOffset:                  ${range.startOffset}
 
@@ -192,54 +255,72 @@ range.endOffset:                    ${range.endOffset}`
 <h3 id="observing-the-selection-and-its-range-object">Observing the
 Selection and its Range object</h3>
 <p>The window’s Selection object is created as soon as the page loads.
-As you can see in the script of your HTML page, you can get a pointer to
-it using <code>window.getSelection()</code>.</p>
+As you can see in the script in the Try This at Home section, you can
+get a pointer to it using <code>window.getSelection()</code>.</p>
 <p>If there is something selected on the page, the Selection object will
-have at least one Range object. But as the next image shows, when the
-page is first loaded, before the first click, nothing is selected, and
-the selection has no Range objects to share. Its <code>rangeCount</code>
-is initially zero.</p>
-<pre class="language-js line-numbers" data-start="37"><code class="language-js line-numbers">const selection = window.getSelection()
-if (!selection.rangeCount) {
-  feedback.innerText = "selection.rangeCount: 0"
-  return
-}</code></pre>
+have at least one Range object. The number of Range objects currently in
+use is given by <code>selection.rangeCount</code>.</p>
+<p>But as the next script extract and image show, when the page is first
+loaded, before the first click, nothing is selected, and the selection
+has no Range objects to share. Its <code>rangeCount</code> is initially
+zero.</p>
+<pre class="language-js line-numbers" data-start="71"><code class="language-js line-numbers"><b>    const selection = window.getSelection()</b>
+
+<i>    setInterval(showSelection, 100)
+
+    function showSelection() {</i>
+<b>      if (!selection.rangeCount) {
+        selectionP.innerText = "selection.rangeCount: 0"</b><i>
+        rangeP.innerText = ""
+        return
+      }</i></code></pre>
+<pre class="skip"><code class="skip">...</code></pre>
+<pre class="language-js line-numbers" data-start="108"><code class="language-js line-numbers">    <i>}</i></code></pre>
 <figure>
-<img src="images/just_loaded.webp" alt="Page just loaded" />
-<figcaption aria-hidden="true">Page just loaded</figcaption>
+<img src="images/just_loaded.webp"
+alt="selection.rangeCount is 0 just after the page loaded" />
+<figcaption aria-hidden="true"><code>selection.rangeCount</code> is 0
+just after the page loaded</figcaption>
 </figure>
-<h3 id="best-supporting-roles">Best Supporting Roles…</h3>
+<h3 id="introducing-the-supporting-cast">Introducing the Supporting
+Cast…</h3>
 <p>If you double-click on the word ‘Click’ or click and drag to select
 it, you’ll see in the grey feedback zone that a Range object is created.
 It has four properties that you will be using a lot:</p>
 <ul>
-<li><code>startContainer</code></li>
-<li><code>startOffset</code></li>
-<li><code>endContainer</code></li>
-<li><code>endOffset</code></li>
+<li><a
+href="https://developer.mozilla.org/en-US/docs/Web/API/Range/startContainer"><code>startContainer</code></a></li>
+<li><a
+href="https://developer.mozilla.org/en-US/docs/Web/API/Range/startOffset"><code>startOffset</code></a>,
+together with</li>
+<li><a
+href="https://developer.mozilla.org/en-US/docs/Web/API/Range/endContainer"><code>endContainer</code></a></li>
+<li><a
+href="https://developer.mozilla.org/en-US/docs/Web/API/Range/endOffset"><code>endOffset</code></a></li>
 </ul>
 <figure>
 <img src="images/click_selected.webp"
 alt="Selecting the word ‘Click’" />
 <figcaption aria-hidden="true">Selecting the word ‘Click’</figcaption>
 </figure>
-<p>You might have two surprises here. First, the range mentions <em>two
+<p>You might have two surprises here. First, the range has <em>two
 container</em> objects: <code>startContainer</code> and
 <code>endContainer</code>, although you know that the word ‘Click’ is
-entirely contained in one <code>&lt;p&gt;</code> element. Second, both
-the <em>nodeName</em> of both the <code>startContainer</code> and the
-<code>endContainer</code> is given as <code>#text</code>, not as
-<code>&lt;p&gt;</code>. The element you created as
-<code>&lt;p id="one"&gt;</code> is shown as the
+entirely contained in <em>one</em> <code>&lt;p&gt;</code> element.
+Second, both the <em>nodeName</em> of both the
+<code>startContainer</code> and the <code>endContainer</code> is given
+as <code>#text</code>, not as <code>&lt;p&gt;</code>. The element you
+created as <code>&lt;p id="one"&gt;</code> is shown as the
 <code>range.startContainer.parentElement</code>.</p>
 <p>You can see the <code>parentElement</code>’s full title and more
-details of the range object, if you place a breakpoint in the
-Debugger:</p>
+details of the range object, if you create your own version of this
+demo, place a breakpoint in the Debugger just after the
+<code>range</code> variable is assigned a value:</p>
 <figure>
 <img src="images/breakpoint.webp"
-alt="Add a breakpoint after the range variable is set…" />
-<figcaption aria-hidden="true">Add a breakpoint after the range variable
-is set…</figcaption>
+alt="In your version of the demo, add a breakpoint after the range variable is set…" />
+<figcaption aria-hidden="true">In your version of the demo, add a
+breakpoint after the range variable is set…</figcaption>
 </figure>
 <figure>
 <img src="images/debugging_range.webp"
@@ -254,82 +335,185 @@ more than just text. It can also contain inline content elements like
 <code>&lt;select&gt;</code>, or inline formatting elements like
 <code>&lt;i&gt;</code> and <code>&lt;b&gt;</code>. Everything between
 these inline elements, and all text inside them, is treated as a
-<code>text node</code>. Even the gaps between HTML elements in the HTML
-page are considered to be text nodes. Here’s an example. All the
-highlighted characters in the HTML code below are in text nodes,
-including the invisible spaces and carriage returns.</p>
-<pre class="language-html"><code class="language-html"><i>&lt;p&gt;<u>↵
-  </u>&lt;span&gt;<u>text node in a child span</u>&lt;/span&gt;<u>↵
-  text node in the top-level paragraph↵</u>
-&lt;/p&gt;</i></code></pre>
+<em>text node</em>. Even the gaps between HTML elements in the HTML page
+are considered to be text nodes. Here’s an example. All the highlighted
+characters in the HTML code below are in text nodes, including the
+invisible spaces and carriage returns.</p>
+<pre class="language-html"><code class="language-html"><i><u>  </u>&lt;p&gt;<u>↵
+    </u>&lt;span&gt;<u>text node in a child span</u>&lt;/span&gt;<u>↵
+    text node in the top-level paragraph↵
+    </u>&lt;code&gt;<u>text node in a code block</u>&lt;/code&gt;<u>↵</u>
+<u>  </u>&lt;/p&gt;</i></code></pre>
 <details class="alert" open>
 <summary>
 White space
 </summary>
 <p>By default, all consecutive white space in text nodes is collapsed
 into a single space (<code></code>) character, so you may not be aware
-of how much white space there actually is. But you’ll need to pay
+of how much white space there actually is. But you will need to pay
 attention: soon you’ll be having to count every last white space
 character, if you want to get your text selection tool to work well.</p>
-<p>Notice, for example, how this line in your HTML file contains many
+<p>Notice, for example, how this line in your HTML file contains seven
 spaces between “drag” and “to”…</p>
-<pre class="language-html line-numbers" data-start="72"><code class="language-html line-numbers">&lt;p id="one"&gt;Click and drag       to make a selection 👍🏼&lt;/p&gt;</code></pre>
-<p>… but this line in the rendered page shows only one:<br><br></p>
+<pre class="language-html line-numbers" data-start="48"><code class="language-html line-numbers">  &lt;p id="one"&gt;Click and drag       to make a selection 👍🏼&lt;/p&gt;</code></pre>
+<p>… but when this line is rendered in the page, it shows only one:</p>
 <figure>
 <img src="images/one_space.webp"
 alt="Only one space rendered between “drag” and “to”" />
-<figcaption aria-hidden="true">Only one space rendered between “drag”
-and “to”</figcaption>
+<figcaption aria-hidden="true">Only one space <em>rendered</em> between
+“drag” and “to”</figcaption>
 </figure>
 </details>
 <h3 id="startoffset-and-endoffset">startOffset and endOffset</h3>
 <p>When the word ‘Click’ is selected, the <code>startOffset</code> is
 <code>0</code> while the <code>endOffset</code> is set to
 <code>5</code>.</p>
-<p>You should be used to JavaScript counting from 0. Here, it is saying
-that your selection starts when there are 0 characters to the left, and
-it ends after the 5-letter word ‘Click’, when there are 5 characters to
-the left.</p>
-<p>On the page, the distance between the start of the letter “g” in
-“drag” and the end of the letter “t” in “two”, looks like it should give
-an offset difference of <code>3</code>, but the <code>range</code>
-object is looking at the source HTML, and it keeps a different
-score:</p>
+<p>You should be used to JavaScript counting from 0, so this should make
+good sense to you. Here, the <code>startOffset</code> is saying that
+your selection starts when there are 0 characters to the left in the
+<code>startContainer</code>, and the <code>endOffset</code> shows that
+after the 5-letter word ‘Click’, there are 5 characters to the left in
+the <code>endContainer</code>… which in this case is exactly the same as
+<code>startContainer</code>,.</p>
+<h3 id="where-white-space-counts">Where white space counts</h3>
+<p>Time for another experiment. In the demo above (or in the version you
+created for yourself), select from the last letter of “drag” to the
+first letter of “to”.</p>
 <figure>
 <img src="images/22-13.webp"
 alt="One visual space can be many HTML white space characterss" />
 <figcaption aria-hidden="true">One visual space can be many HTML white
 space characterss</figcaption>
 </figure>
+<p>On the page, it looks like there is only one space between the start
+of the letter “g” in “drag” and the end of the letter “t” in “two”. But
+the <code>range</code> object is looking at the source HTML, and it
+keeps a different score. It counts one letter “g”, then seven spaces,
+and then one letter “t” — a difference of 9:</p>
+<h3 id="when-a-character-is-more-than-it-appears-to-be">When a character
+is more than it appears to be</h3>
+<p>Third experiment: select the emoji 👍🏼 and check what the values are
+for <code>startOffset</code> and <code>endOffset</code>.</p>
 <figure>
 <img src="images/emoji_selected.webp"
 alt="An emoji can count as several characters" />
 <figcaption aria-hidden="true">An emoji can count as several
 characters</figcaption>
 </figure>
-<figure>
-<img src="images/image_selected.webp"
-alt="The alt text of an image as seen by Selection" />
-<figcaption aria-hidden="true">The alt text of an image as seen by
-Selection</figcaption>
-</figure>
+<p>Surprised? The demo shows that <code>startOffset</code> is 41 and
+<code>endOffset</code> is 45. That suggest that the 👍🏼 is four
+characters long, but it only takes up one place.</p>
+<h3 id="utf-16-units">UTF-16 units</h3>
+<p>Computing as we know it today first started in the English-speaking
+world. In English, there are 26 letters (a-z), with 52 different signs
+for UPPERCASE and lowercase, plus ten digits (0-9), plus a few
+punctuations marks like <code>,;;.!?()/%$£#'"- —…</code>, and of course,
+the space. All these characters could be given numbers, with the highest
+number staying below 127. By coincidence, the number 127 in decimal is
+1111111 in the binary system, and binary numbers are conveniently
+bundled in groups of 8 bits, so everything was perfect, and it was
+called ASCII. <em>American Standard Code for Information
+Interchange</em>.</p>
+<p>And this was perfect, at least, for people using the same Latin
+alphabet as English.</p>
+<p>But there is not just English in the world. There are many different
+writing scripts, like Arabic and the Indian Devanagari script, not to
+mention languages like Chinese which contain thousands of individual
+pictograms. To enable computers to handle all the thousands of different
+written symbols, the system of giving each symbol a number had to be
+extended.</p>
+<p>One standard now is <a
+href="https://en.wikipedia.org/wiki/UTF-16">UTF-16</a>, which has
+variable-length blocks from 8 to 32 bits, and which provides enough
+numbers, to label the 1,112,064 different symbols from many different
+languages that are recognized today. And it turns out that UTF-16 still
+has a few numbers left over, and these are now being used for
+emojis.</p>
+<p>So you might imagine that an emoji would take two character spaces,
+where English letters, numbers and punctuation take only one. But that
+is politically incorrect. Emojis that show humans and parts of humans
+can have different skin colours, so the 👍🏼 emoji takes two values: a
+generic thumbs-up plus a skin colour.</p>
+<p>To cut a long story short: <code>startOffset</code> and
+<code>endOffset</code> do not count characters or bits or bytes. They
+count <code>UTF-16 units</code>, and the 👍🏼 emoji uses four UTF-16
+units.</p>
+<p>From now on, I’ll just call the <code>units</code>, and you’ll
+discover later just how important it is to think in <em>units</em>
+rather than <em>characters</em> when working in with other languages
+(and with emojis).</p>
+<details class="note" open>
+<summary>
+Units and Spaces
+</summary>
+<p>The important point to note is that the Selection and Range objects
+use a different system for counting where a selection starts and
+finishes than the one that might seem familiar to you.</p>
+<p>So now you know, and you can start to think about selections with
+this new mental image.</p>
+</details>
+<h3 id="when-startcontainer-and-endcontainer-are-different">When
+startContainer and endContainer are different</h3>
+<p>So far, the only selections we have looked at together have started
+and ended in the same container. How is a selection represented when it
+starts in one HTML element and finishes in another?</p>
+<p>Let’s look at two simple cases. For the first case, click in the line
+at the top and drag your mouse down, so that the selection starts in the
+first <code>&lt;p&gt;</code> element and ends in the second
+<code>&lt;p&gt;</code> element:</p>
+<pre class="language-html line-numbers" data-start="46"><code class="language-html line-numbers"><i>    &lt;p id="one"&gt;Click and drag<u>       to make a selection 👍🏼&lt;/p&gt;
+    &lt;p id="two"&gt;Your selection </u>can &lt;i&gt;start&lt;/i&gt; on one
+    line and &lt;i&gt;end&lt;/i&gt; on another.&lt;/p&gt;</i></code></pre>
 <figure>
 <img src="images/two_lines.webp"
 alt="When startContainer and endContainer are different" />
 <figcaption aria-hidden="true">When startContainer and endContainer are
 different</figcaption>
 </figure>
+<p>Note that <code>startOffset</code> gives you the number of units from
+the beginning of the text node in the <code>&lt;p id="one"&gt;</code>
+paragraph, and that <code>endOffset</code> gives you the number of units
+from the beginning of the text node in the
+<code>&lt;p id="two"&gt;</code> paragraph. Both of these containers are
+identified with the <code>nodeName</code> <code>#text</code>, but the
+identity of their <code>.parentElement</code> distinguishes them.</p>
+<p>Specifically, notice that neither offset is measured from the
+beginning of the page. Each of them is relative to their container.</p>
+<h3 id="nested-containers">Nested containers</h3>
+<p>Here’s the second simple case to test. Click somewhere inside the
+word “start” (in <i>italics</i>), and drag the selection to somewhere
+outside the word, where the text is no longer in italics.</p>
+<pre class="language-html line-numbers" data-start="47"><code class="language-html line-numbers"><i>    &lt;p id="two"&gt;Your selection </u>can &lt;i&gt;s<u>tart&lt;/i&gt; on one
+    line</u> and &lt;i&gt;end&lt;/i&gt; on another.&lt;/p&gt;</i></code></pre>
 <figure>
 <img src="images/start_in_i_tag.webp"
 alt="Container.parentElements of different types" />
 <figcaption aria-hidden="true">Container.parentElements of different
 types</figcaption>
 </figure>
+<p>Note that the <code>startContainer</code>’s
+<code>parentElement</code> is now reported as an <code>i</code> element,
+while the <code>endContainer</code>’s <code>parentElement</code> is
+reported as <code>p#two</code>. The <code>&lt;p id="two"&gt;</code>
+paragraph has several top-level text nodes, separated by the text nodes
+inside the <code>&lt;i&gt;</code> tags, as the image below
+illustrates:</p>
+<pre class="language-html"><code class="language-html">&lt;p&gt;<u>text node</u>&lt;i&gt;<u>text node</u>&lt;/i&gt;<u>text node</u>&lt;i&gt;<u>text node</u>&lt;/i&gt;<u>text node</u>&lt;/p&gt;</code></pre>
+<p>In every case, <code>startOffset</code> and <code>endOffset</code>
+are calculated <em>from the beginning of the specific text node</em> in
+which they occur. Be sure to note that the <code>parentElement</code>
+only helps identify where a given text node occurs, but its position and
+the length of its text are never used to <code>startOffset</code> and
+<code>endOffset</code>.</p>
+<h3 id="never-say-never.-safari-has-its-own-opinion.">Never say never.
+Safari has its own opinion.</h3>
+<p>Earlier, I wrote that you would look at two simple cases. Here’s a
+third case, but it turns out not to be simple at all.</p>
 <figure>
-<img src="images/input_selected.webp"
-alt="Text that can’t be selected by Selection" />
-<figcaption aria-hidden="true">Text that can’t be selected by
-Selection</figcaption>
+<img src="images/invisible_caret.webp"
+alt="A click collapses the Selection to an invisible caret" />
+<figcaption aria-hidden="true">A click collapses the Selection to an
+invisible caret</figcaption>
 </figure>
 <figure>
 <img src="images/all_selected.webp"
@@ -338,18 +522,31 @@ alt="Everything on the page is “selected”… or is it?" />
 is it?</figcaption>
 </figure>
 <figure>
+<img src="images/input_selected.webp"
+alt="Text that can’t be selected by Selection" />
+<figcaption aria-hidden="true">Text that can’t be selected by
+Selection</figcaption>
+</figure>
+<figure>
 <img src="images/all_deselected.webp"
 alt="A click to the right of the input field: no text selected" />
 <figcaption aria-hidden="true">A click to the right of the input field:
 no text selected</figcaption>
 </figure>
 <figure>
-<img src="images/invisible_caret.webp"
-alt="A click collapses the Selection to an invisible caret" />
-<figcaption aria-hidden="true">A click collapses the Selection to an
-invisible caret</figcaption>
+<img src="images/image_selected.webp"
+alt="The alt text of an image as seen by Selection" />
+<figcaption aria-hidden="true">The alt text of an image as seen by
+Selection</figcaption>
 </figure>
 </section>
+<style>
+  code u,
+  code u * {
+    background-color: #368 !important;
+    filter: brightness(1);
+  }
+</style>
 <section id="intro" aria-labelledby="intro" data-item="Introduction">
 <h2>
 <a href="#intro">Introduction</a>

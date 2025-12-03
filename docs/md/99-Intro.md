@@ -5,6 +5,15 @@ month: November 2025
 organization: MERNCraft
 repo: SplitSpans
 ---
+
+<style>
+  code u,
+  code u * {
+    background-color: #368 !important;
+    filter: brightness(1);
+  }
+</style>
+
 <section
   id="intro"
   aria-labelledby="intro"
