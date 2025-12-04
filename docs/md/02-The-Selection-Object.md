@@ -36,7 +36,6 @@ The selection **can** however contain formatting tags and their content, like `T
 
 To get an idea of what `selection` can and cannot see, click and drag to make some selections in the demo below, and watch how the text in the grey feedback zone changes.
 
-
 <iframe
   id="selection-and-range"
   title="Selection and Range"
@@ -59,7 +58,15 @@ Try selecting different parts of the page:
 
 Also, try simply clicking somewhere in the text without making any selection.
 
-> You can find the full script of this demo in the _Try This at Home_ section below. I'll be quoting extracts of the script in what follows, so that you can see how the code works.
+<details class="tip" open>
+<summary>Keep the demo accessible for testing</summary>
+You might like to open this page in a second browser window, so that you can keep this demo available side-by-side for testing as you scroll down in this window to read the rest of the tutorial.
+
+Alternatively, you can create your own version of the demo and open it in a separate window.
+
+You can find the full script of this demo in the _Try This at Home_ section below. I'll be quoting extracts of the script in what follows, so that you can see how the code works.
+
+</details>
 
 <details class="solution">
 <summary>Try This at Home</summary>
@@ -268,102 +275,14 @@ Notice, for example, how this line in your HTML file contains seven spaces betwe
 
 When the word 'Click' is selected, the `startOffset` is `0` while the `endOffset` is set to `5`.
 
-You should be used to JavaScript counting from 0, so this should make good sense to you. Here, the `startOffset` is saying that your selection starts when there are 0 characters to the left in the `startContainer`, and the `endOffset` shows that after the 5-letter word 'Click', there are 5 characters to the left in the `endContainer`... which in this case is exactly the same as `startContainer`,.
-
-### Where white space counts
-
-Time for another experiment. In the demo above (or in the version you created for yourself), select from the last letter of "drag" to the first letter of "to".
-
-![One visual space can be many HTML white space characterss](images/22-13.webp)
-
-On the page, it looks like there is only one space between the start of the letter "g" in "drag" and the end of the letter "t" in "two". But the `range` object is looking at the source HTML, and it keeps a different score. It counts one letter "g", then seven spaces, and then one letter "t" — a difference of 9:
-
-### When a character is more than it appears to be
-
-Third experiment: select the emoji 👍🏼 and check what the values are for `startOffset` and `endOffset`.
-
-![An emoji can count as several characters](images/emoji_selected.webp)
-
-Surprised? The demo shows that `startOffset` is 41 and `endOffset` is 45. That suggest that the 👍🏼 is four characters long, but it only takes up one place.
-
-### UTF-16 units
-
-Computing as we know it today first started in the English-speaking world. In English, there are 26 letters (a-z), with 52 different signs for UPPERCASE and lowercase, plus ten digits (0-9), plus a few punctuations marks like `,;;.!?()/%$£#'"- —…`, and of course, the space. All these characters could be given numbers, with the highest number staying below 127. By coincidence, the number 127 in decimal is 1111111 in the binary system, and binary numbers are conveniently bundled in groups of 8 bits, so everything was perfect, and it was called ASCII. _American Standard Code for Information Interchange_.
-
-And this was perfect, at least, for people using the same Latin alphabet as English.
-
-But there is not just English in the world. There are many different writing scripts, like Arabic and the Indian Devanagari script, not to mention languages like Chinese which contain thousands of individual pictograms. To enable computers to handle all the thousands of different written symbols, the system of giving each symbol a number had to be extended.
-
-One standard now is [UTF-16](https://en.wikipedia.org/wiki/UTF-16), which has variable-length blocks from 8 to 32 bits, and which provides enough numbers, to label the 1,112,064 different symbols from many different languages that are recognized today. And it turns out that UTF-16 still has a few numbers left over, and these are now being used for emojis.
-
-So you might imagine that an emoji would take two character spaces, where English letters, numbers and punctuation take only one. But that is politically incorrect. Emojis that show humans and parts of humans can have different skin colours, so the 👍🏼 emoji takes two values: a generic thumbs-up plus a skin colour.
-
-To cut a long story short: `startOffset` and `endOffset` do not count characters or bits or bytes. They count `UTF-16 units`, and the 👍🏼 emoji uses four UTF-16 units.
-
-From now on, I'll just call the `units`, and you'll discover later just how important it is to think in _units_ rather than _characters_ when working in with other languages (and with emojis).
+You should be used to JavaScript counting from 0, so this should make good sense to you. Here, the `startOffset` is saying that your selection starts when there are 0 characters to the left in the `startContainer`, and the `endOffset` shows that after the 5-letter word 'Click', there are 5 characters <i>to the left</i> in the `endContainer`... which in this case is exactly the same as `startContainer`.
 
 <details class="note" open>
-<summary>Units and Spaces</summary>
-The important point to note is that the Selection and Range objects use a different system for counting where a selection starts and finishes than the one that might seem familiar to you.
+<summary>`endOffset` is exclusive</summary>
+An `endOffset` of `5` tells you that `"Click and drag..."[5]` (the character at index 5) is **not** included ind the selection. `"Click and drag..."[5]` refers to the _space_ after the end of the word `Click`, and not the "k", which is at index `4`.
 
-So now you know, and you can start to think about selections with this new mental image.
+`endOffset` in _exclusive_. It always refers to the first character that is **not** included in the selection.
 
 </details>
-
-### When startContainer and endContainer are different
-
-So far, the only selections we have looked at together have started and ended in the same container. How is a selection represented when it starts in one HTML element and finishes in another?
-
-Let's look at two simple cases. For the first case, click in the line at the top and drag your mouse down, so that the selection starts in the first `<p>` element and ends in the second `<p>` element:
-
-```html-#46
-<i>    &lt;p id="one"&gt;Click and drag<u>       to make a selection 👍🏼&lt;/p&gt;
-    &lt;p id="two"&gt;Your selection </u>can &lt;i&gt;start&lt;/i&gt; on one
-    line and &lt;i&gt;end&lt;/i&gt; on another.&lt;/p&gt;</i>
- ```
-
-![When startContainer and endContainer are different](images/two_lines.webp)
-
-Note that `startOffset` gives you the number of units from the beginning of the text node in the `<p id="one">` paragraph, and that `endOffset` gives you the number of units from the beginning of the text node in the `<p id="two">` paragraph. Both of these containers are identified with the `nodeName` `#text`, but the identity of their `.parentElement` distinguishes them.
-
-Specifically, notice that neither offset is measured from the beginning of the page. Each of them is relative to their container.
-
-### Nested containers
-
-Here's the second simple case to test. Click somewhere inside the word "start" (in <i>italics</i>), and drag the selection to somewhere outside the word, where the text is no longer in italics.
-
-```html-#47
-<i>    &lt;p id="two"&gt;Your selection </u>can &lt;i&gt;s<u>tart&lt;/i&gt; on one
-    line</u> and &lt;i&gt;end&lt;/i&gt; on another.&lt;/p&gt;</i>
- ```
-
-![Container.parentElements of different types](images/start_in_i_tag.webp)
-
-Note that the `startContainer`'s `parentElement` is now reported as an `i` element, while the `endContainer`'s `parentElement` is reported as `p#two`. The `<p id="two">` paragraph has several top-level text nodes, separated by the text nodes inside the `<i>` tags, as the image below illustrates:
-
-```html-#
-&lt;p&gt;<u>text node</u>&lt;i&gt;<u>text node</u>&lt;/i&gt;<u>text node</u>&lt;i&gt;<u>text node</u>&lt;/i&gt;<u>text node</u>&lt;/p&gt;
-```
-
-In every case, `startOffset` and `endOffset` are calculated _from the beginning of the specific text node_ in which they occur. Be sure to note that the `parentElement` only helps identify where a given text node occurs, but its position and the length of its text are never used to `startOffset` and `endOffset`.
-
-### Never say never. Safari has its own opinion.
-
-Earlier, I wrote that you would look at two simple cases. Here's a third case, but it turns out not to be simple at all.
-
-
-![A click collapses the Selection to an invisible caret](images/invisible_caret.webp)
-
-
-![Everything on the page is "selected"... or is it?](images/all_selected.webp)
-
-
-![Text that can't be selected by Selection](images/input_selected.webp)
-
-
-![A click to the right of the input field: no text selected](images/all_deselected.webp)
-
-
-![The alt text of an image as seen by Selection](images/image_selected.webp)
 
 </section>

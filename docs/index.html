@@ -123,11 +123,19 @@ object is aware of</li>
 </ul>
 <p>Also, try simply clicking somewhere in the text without making any
 selection.</p>
-<blockquote>
+<details class="tip" open>
+<summary>
+Keep the demo accessible for testing
+</summary>
+<p>You might like to open this page in a second browser window, so that
+you can keep this demo available side-by-side for testing as you scroll
+down in this window to read the rest of the tutorial.</p>
+<p>Alternatively, you can create your own version of the demo and open
+it in a separate window.</p>
 <p>You can find the full script of this demo in the <em>Try This at
 Home</em> section below. I’ll be quoting extracts of the script in what
 follows, so that you can see how the code works.</p>
-</blockquote>
+</details>
 <details class="solution">
 <summary>
 Try This at Home
@@ -372,13 +380,32 @@ alt="Only one space rendered between “drag” and “to”" />
 good sense to you. Here, the <code>startOffset</code> is saying that
 your selection starts when there are 0 characters to the left in the
 <code>startContainer</code>, and the <code>endOffset</code> shows that
-after the 5-letter word ‘Click’, there are 5 characters to the left in
-the <code>endContainer</code>… which in this case is exactly the same as
-<code>startContainer</code>,.</p>
-<h3 id="where-white-space-counts">Where white space counts</h3>
-<p>Time for another experiment. In the demo above (or in the version you
-created for yourself), select from the last letter of “drag” to the
-first letter of “to”.</p>
+after the 5-letter word ‘Click’, there are 5 characters <i>to the
+left</i> in the <code>endContainer</code>… which in this case is exactly
+the same as <code>startContainer</code>.</p>
+<details class="note" open>
+<summary>
+<code>endOffset</code> is exclusive
+</summary>
+<p>An <code>endOffset</code> of <code>5</code> tells you that
+<code>"Click and drag..."[5]</code> (the character at index 5) is
+<strong>not</strong> included ind the selection.
+<code>"Click and drag..."[5]</code> refers to the <em>space</em> after
+the end of the word <code>Click</code>, and not the “k”, which is at
+index <code>4</code>.</p>
+<p><code>endOffset</code> in <em>exclusive</em>. It always refers to the
+first character that is <strong>not</strong> included in the
+selection.</p>
+</details>
+</section>
+<!-- Counting White Space -->
+<section id="counting-units" aria-labelledby="counting-units" data-item="Counting Units">
+<h2>
+<a href="#counting-units">Counting Units</a>
+</h2>
+<p>Time for another experiment. In the demo you used earlier (or in the
+version you created for yourself), select from the last letter of “drag”
+to the first letter of “to”.</p>
 <figure>
 <img src="images/22-13.webp"
 alt="One visual space can be many HTML white space characterss" />
@@ -438,7 +465,7 @@ generic thumbs-up plus a skin colour.</p>
 <code>endOffset</code> do not count characters or bits or bytes. They
 count <code>UTF-16 units</code>, and the 👍🏼 emoji uses four UTF-16
 units.</p>
-<p>From now on, I’ll just call the <code>units</code>, and you’ll
+<p>From now on, I’ll just call them <code>units</code>, and you’ll
 discover later just how important it is to think in <em>units</em>
 rather than <em>characters</em> when working in with other languages
 (and with emojis).</p>
@@ -452,14 +479,19 @@ finishes than the one that might seem familiar to you.</p>
 <p>So now you know, and you can start to think about selections with
 this new mental image.</p>
 </details>
-<h3 id="when-startcontainer-and-endcontainer-are-different">When
-startContainer and endContainer are different</h3>
+</section>
+<!-- Different Containers -->
+<!-- Role of Text Nodes -->
+<section id="role-of-text-nodes" aria-labelledby="role-of-text-nodes" data-item="The Role of Text Nodes">
+<h2>
+<a href="#role-of-text-nodes">The Role of Text Nodes</a>
+</h2>
 <p>So far, the only selections we have looked at together have started
 and ended in the same container. How is a selection represented when it
 starts in one HTML element and finishes in another?</p>
-<p>Let’s look at two simple cases. For the first case, click in the line
-at the top and drag your mouse down, so that the selection starts in the
-first <code>&lt;p&gt;</code> element and ends in the second
+<p>Let’s start with two simple cases. For the first case, click in the
+line at the top and drag your mouse down, so that the selection starts
+in the first <code>&lt;p&gt;</code> element and ends in the second
 <code>&lt;p&gt;</code> element:</p>
 <pre class="language-html line-numbers" data-start="46"><code class="language-html line-numbers"><i>    &lt;p id="one"&gt;Click and drag<u>       to make a selection 👍🏼&lt;/p&gt;
     &lt;p id="two"&gt;Your selection </u>can &lt;i&gt;start&lt;/i&gt; on one
@@ -499,16 +531,150 @@ paragraph has several top-level text nodes, separated by the text nodes
 inside the <code>&lt;i&gt;</code> tags, as the image below
 illustrates:</p>
 <pre class="language-html"><code class="language-html">&lt;p&gt;<u>text node</u>&lt;i&gt;<u>text node</u>&lt;/i&gt;<u>text node</u>&lt;i&gt;<u>text node</u>&lt;/i&gt;<u>text node</u>&lt;/p&gt;</code></pre>
+<details class="note" open>
+<summary>
+Respect for #text nodes
+</summary>
 <p>In every case, <code>startOffset</code> and <code>endOffset</code>
 are calculated <em>from the beginning of the specific text node</em> in
-which they occur. Be sure to note that the <code>parentElement</code>
-only helps identify where a given text node occurs, but its position and
-the length of its text are never used to <code>startOffset</code> and
+which they occur.</p>
+<p>Be sure to note that the <code>parentElement</code> only helps
+identify where a given text node occurs, but its position and the length
+of its text are never used to <code>startOffset</code> and
 <code>endOffset</code>.</p>
-<h3 id="never-say-never.-safari-has-its-own-opinion.">Never say never.
-Safari has its own opinion.</h3>
+</details>
+</section>
+<!-- Browser Differences -->
+<section id="browser-differences" aria-labelledby="browser-differences" data-item="Browser Differences">
+<h2>
+<a href="#browser-differences">Edge Cases and Browser Differences</a>
+</h2>
 <p>Earlier, I wrote that you would look at two simple cases. Here’s a
-third case, but it turns out not to be simple at all.</p>
+third case, but it turns out not to be simple at all. The results you
+get will depend on which browser you are using, and even how you make
+the selection.</p>
+<p>Select the words “<em>start</em> on one line and <em>end</em>”,
+making sure that the selection begins with the whole word
+“<em>start</em>” and ends with the whole word “<em>end</em>”.</p>
+<p>But try different ways of making this selection:</p>
+<ul>
+<li>Drag from the beginning of the word “<em>start</em>” to the end of
+the word “<em>end</em>”</li>
+<li>Double click on the word “<em>start</em>” then press Shift and click
+after the word “<em>end</em>”</li>
+<li>Select from the beginning of the word “<em>start</em>” to somewhere
+in the middle of the word “<em>end</em>”, then use Shift+Right Arrow to
+extend the selection to the end of the word “<em>end</em>”</li>
+<li>Select from the end of the word “<em>end</em>” to somewhere in the
+middle of the word “<em>start</em>”, then use Shift+Left Arrow to extend
+the selection to the end of the word “<em>start</em>”</li>
+<li>…</li>
+</ul>
+<p>Try doing this in different browsers. Here are some of the ways the
+<code>range</code> values may be set:</p>
+<hr />
+<pre class="language-html"><code class="language-html">... can &lt;i&gt;<u>start&lt;/i&gt; on one line and &lt;i&gt;end</u>&lt;/i&gt; on...</code></pre>
+<figure>
+<img src="images/chrome.webp" alt="i 0 to i 3 on Chrome" />
+<figcaption aria-hidden="true"><em>i 0</em> to <em>i 3</em> on
+Chrome</figcaption>
+</figure>
+<hr />
+<pre class="language-html"><code class="language-html">... can <u>&lt;i&gt;start&lt;/i&gt; on one line and &lt;i&gt;end</u>&lt;/i&gt; on...</code></pre>
+<figure>
+<img src="images/safari.webp" alt="p#two 19 to i 3 on Safari" />
+<figcaption aria-hidden="true"><em>p#two 19</em> to <em>i 3</em> on
+Safari</figcaption>
+</figure>
+<hr />
+<pre class="language-html"><code class="language-html">... can &lt;i&gt;<u>start&lt;/i&gt; on one line and &lt;i&gt;end&lt;/i&gt;</u> on...</code></pre>
+<figure>
+<img src="images/firefox.webp" alt="i 0 to p#two 0 on Firefox" />
+<figcaption aria-hidden="true"><em>i 0</em> to <em>p#two 0</em> on
+Firefox</figcaption>
+</figure>
+<hr />
+<p>Selections that look exactly the same on the screen may be described
+differently by the <code>range</code> object, when the selection
+boundary is at the boundary between two containers. All of these
+descriptions are correct, but they all have slightly different
+meanings.</p>
+<p>And try this: double-click on the 👍🏼 emoji at the end of
+<code>&lt;p id="one"&gt;</code>, then press Shift+Right Arrow.</p>
+<figure>
+<img src="images/double_click_emoji.webp"
+alt="Double click to select the emoji…" />
+<figcaption aria-hidden="true">Double click to select the
+emoji…</figcaption>
+</figure>
+<figure>
+<img src="images/Shift_Right_Arrow.webp"
+alt="… then press Shift+Right arrow to extend the selection" />
+<figcaption aria-hidden="true">… then press Shift+Right arrow to extend
+the selection</figcaption>
+</figure>
+<p>The visual appearance of the selection will not change, but the
+<code>range</code> object will now see that you have extended the
+selection to include the invisible carriage return and white space
+characters between the two <code>&lt;p&gt;</code> elements.</p>
+<pre class="language-html line-numbers" data-start="48"><code class="language-html line-numbers">  &lt;p id="one"&gt;Click and drag       to make a selection 👍🏼&lt;/p&gt;<u>↵  
+  </u>&lt;p id="two"&gt;Your selection can &lt;i&gt;start&lt;/i&gt; on one line and</code></pre>
+<h3 id="need-to-normalize">Need to Normalize</h3>
+<p>The point to note here is that you cannot trust the Selection data
+blindly. You will need to <em>normalize</em> a selection to a specific,
+known state, before you start to work with it. Precisely how you
+normalize it will depend on how you plan to work with it.</p>
+<p>For example, suppose you have text like this:</p>
+<blockquote>
+<p>Compare <em>short</em>-term and <em>long</em>-term planning</p>
+</blockquote>
+<p>And suppose one of your end-users makes a partial selection, like
+this:</p>
+<pre class="language-html"><code class="language-html">Compare &lt;i&gt;short&lt;i&gt;<u>-term and &lt;i&gt;long</u>&lt;i&gt;-term planning</code></pre>
+<p>If your app is designed to ensure that whole words are selected, it
+will need to change the initial selection to this:</p>
+<pre class="language-html"><code class="language-html">Compare <u>&lt;i&gt;short&lt;i&gt;-term and &lt;i&gt;long&lt;i&gt;-term</u> planning</code></pre>
+<p>In this case, you will want your app to normalize the start and the
+end of the selection in different ways:</p>
+<ul>
+<li>You want to normalize the start of the selection to begin at the end
+of the first &lt;i&gt; tag, so that your app can extend the start
+backwards, to add “<em>short</em>” to the word “-term”</li>
+<li>You want to normalzie the end of the selection to the beginning of
+the text node following the closing &lt;/i&gt; tag, so that your app can
+extend the end forwards, to add “term” to the word “<em>long</em>”.</li>
+</ul>
+<p>In other words, here’s how your app would need to normalize the
+user’s selection before using it to extend to include whole words:</p>
+<pre class="language-html"><code class="language-html">Compare &lt;i&gt;short<u>&lt;i&gt;-term and &lt;i&gt;long&lt;i&gt;</u>-term planning</code></pre>
+<p>Other cases might require different normalization techniques.</p>
+<details class="note" open>
+<summary>
+The lesson to learn here
+</summary>
+<p>Sometimes you will need to <strong>adjust the raw selection
+data</strong> that the browser gives you, so that you can use the
+selection the way you want to use it.</p>
+</details>
+</section>
+<!-- Other Selection States -->
+<section id="other-selection-states" aria-labelledby="other-selection-states" data-item="Other Selection Cases">
+<h2>
+<a href="#other-selection-states">Other Selection Cases</a>
+</h2>
+<h3 id="a-collapsed-selection">A collapsed Selection</h3>
+<p>As you saw earlier, before you make your first click on a
+newly-opened web page, the Selection object already exists but it does
+not yet contain any Range objects. After the first Range object has been
+created, a simple click on the page will deselect all text, but the
+Range object will continue to exist. No selection will be visible on the
+page.</p>
+<p>After a simple click, the Selection will simply set its
+<code>isCollapsed</code> property to <code>true</code>, the
+<code>startOffset</code> and <code>endOffset</code> will be set to the
+same numerical value, and the <code>startContainer</code> and
+<code>endContainer</code> will both refer to the same text node.</p>
+<p>Try clicking on the demo page in different places.</p>
 <figure>
 <img src="images/invisible_caret.webp"
 alt="A click collapses the Selection to an invisible caret" />
@@ -516,29 +682,116 @@ alt="A click collapses the Selection to an invisible caret" />
 invisible caret</figcaption>
 </figure>
 <figure>
-<img src="images/all_selected.webp"
-alt="Everything on the page is “selected”… or is it?" />
-<figcaption aria-hidden="true">Everything on the page is “selected”… or
-is it?</figcaption>
+<img src="images/isCollapsed.webp" alt="When a Selection isCollapsed" />
+<figcaption aria-hidden="true">When a Selection isCollapsed</figcaption>
 </figure>
-<figure>
-<img src="images/input_selected.webp"
-alt="Text that can’t be selected by Selection" />
-<figcaption aria-hidden="true">Text that can’t be selected by
-Selection</figcaption>
-</figure>
+<p>If you click outside any text content, the Selection will still be
+collapsed, but the range will not be a text node:</p>
 <figure>
 <img src="images/all_deselected.webp"
-alt="A click to the right of the input field: no text selected" />
-<figcaption aria-hidden="true">A click to the right of the input field:
-no text selected</figcaption>
+alt="A click to the right of the input field, not in a text node" />
+<figcaption aria-hidden="true">A click to the right of the input field,
+not in a text node</figcaption>
+</figure>
+<details class="note" open>
+<summary>
+Selection.isCollapsed
+</summary>
+<p>When there is no visible selection in the page:</p>
+<ul>
+<li>The Selection’s’ <code>isCollapsed</code> property will be set to
+<code>true</code></li>
+<li>The <code>startOffset</code> and <code>endOffset</code> will be set
+to the same numerical value</li>
+<li>The <code>startContainer</code> and <code>endContainer</code> will
+both refer to the same text node.</li>
+</ul>
+</details>
+<h3 id="a-selection-with-no-range-object">A Selection with no Range
+object</h3>
+<p>It’s possible to destroy the Range object, by selecting something
+that the Selection object can’t directly see. Try typing some text into
+the <code>&lt;input type="text"&gt;</code> field, and then select some
+of your input text.</p>
+<figure>
+<img src="images/input_selected0.webp"
+alt="The Selection can’t see text in &lt;input&gt; elements…" />
+<figcaption aria-hidden="true">The Selection can’t see text in
+<code>&lt;input&gt;</code> elements…</figcaption>
+</figure>
+<p>But perhaps you see something different? Perhaps you see that
+<code>selection.toString()</code> does indeed show the text that you
+selected in the input field:</p>
+<figure>
+<img src="images/input_selected1.webp" alt="… or can it?" />
+<figcaption aria-hidden="true">… or can it?</figcaption>
+</figure>
+<p>This depends on which browser you are using, and whether the
+selection that you made just before was collapsed or not.</p>
+<details class="note" open>
+<summary>
+Selection inside an <code>&lt;input type="text"&gt;</code> field
+</summary>
+<p>The result of selecting inside an
+<code>&lt;input type="text"&gt;</code> field is not well-defined.</p>
+<p>Depending on the browser and your most recent selection, selecting
+text inside an <code>&lt;input type="text"&gt;</code> field can
+either:</p>
+<ul>
+<li>Destroy the Selection’s Range object</li>
+<li>Provide a unexpected value for the <code>startContainer</code> and
+<code>endContainer</code>, and display the text selected in the
+<code>&lt;input type="text"&gt;</code> field as
+<code>Selection.toString()</code></li>
+</ul>
+</details>
+<h3 id="browser-differences-when-you-select-all">Browser differences
+when you Select All</h3>
+<p>WHen you user the Menu item Edit &gt; Select All, or the
+corresponding keyboard shortcut, different browsers will display the
+selection differently on the page, and Selection.toString() may have
+different values.</p>
+<p>Chrome and Edge mostly agree; Safari also highlights empty space to
+the left. Firefox does things differently:</p>
+<ul>
+<li>Firefox includes invisible carriage returns known only to the
+HTML</li>
+<li>Firefox does not highlight text in an
+<code>&lt;input type="text"&gt;</code> field</li>
+<li>Firefox includes the <em>alt</em> text of an image in
+Selection.string()</li>
+</ul>
+<p>All browsers agree, though, <strong>not</strong> to include:</p>
+<ul>
+<li>The text of <code>::before</code> and <code>::after</code> and other
+pseudo-elements</li>
+<li>Elements with the CSS rule: <code>{ user-select: none }</code></li>
+</ul>
+<figure>
+<img src="images/select_all_chrome.webp" alt="Select All on Chrome" />
+<figcaption aria-hidden="true">Select All on Chrome</figcaption>
 </figure>
 <figure>
-<img src="images/image_selected.webp"
-alt="The alt text of an image as seen by Selection" />
-<figcaption aria-hidden="true">The alt text of an image as seen by
-Selection</figcaption>
+<img src="images/select_all_safari.webp" alt="Select All on Safari" />
+<figcaption aria-hidden="true">Select All on Safari</figcaption>
 </figure>
+<figure>
+<img src="images/select_all_edge.webp" alt="Select All on Edge" />
+<figcaption aria-hidden="true">Select All on Edge</figcaption>
+</figure>
+<figure>
+<img src="images/select_all_firefox.webp" alt="Select All on Firefox" />
+<figcaption aria-hidden="true">Select All on Firefox</figcaption>
+</figure>
+<details class="alert" open>
+<summary>
+Test early, test often, test on all target browsers
+</summary>
+<p>You probably don’t need to be reminded of this, but you can’t trust
+all browsers to behave the same way, and you need to make sure that your
+code is working exactly the way you expect on all the browsers that you
+end-users are likely to use.</p>
+</details>
 </section>
 <style>
   code u,
