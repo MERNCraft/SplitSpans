@@ -793,6 +793,182 @@ code is working exactly the way you expect on all the browsers that you
 end-users are likely to use.</p>
 </details>
 </section>
+<!-- Word Boundaries -->
+<section id="word-boundaries" aria-labelledby="word-boundaries" data-item="Word Boundaries">
+<h2>
+<a href="#word-boundaries">Word Boundaries</a>
+</h2>
+<p>Where does one word end and the next word begin? Since your early
+childhood, you have been able to detect word boundaries in spoken
+speech. Try asking a two-year old to say “speedboat”. (Make sure you
+pronounce the “d”.) The chances are that the child will answer with two
+words with a distinct gap between them: “speed … boat”. That’s because
+the sequence “db” is very unusual in English words. Before children can
+say the words “statistical probability”, their brains are busy analysing
+the sounds they hear according to statistical probability.</p>
+<p>You need to take a quick glance at these two sentences to know that
+they are different, and that the words need to be pronounced
+differently, possibly with a different accent:</p>
+<blockquote>
+<p>The irregular program mess ends now.</p>
+<p>Their regular programmes send snow.</p>
+</blockquote>
+<p>But both sentences use the exact same letters in the exact same
+order, and only the position of the spaces change. Your brain can
+immediately see the differences, and may not even notice the similarity
+until it is pointed out to you.</p>
+<p>In this project, which aims to to ensure that every selection starts
+and ends with a whole word, you’ll somehow need to explain to your
+browser what a whole word is, even when there are HTML tags to confuse
+it.</p>
+<p>Does the following HTML seem clear to you, now, even when you know
+what you are looking for?</p>
+<pre class="language-html wrap"><code class="language-html wrap">&lt;p id="source"&gt;&lt;i class="after"&gt;The&lt;u&gt; &lt;/u&gt;ir&lt;/i&gt;&lt;b&gt;regular program&lt;u&gt; &lt;/u&gt;mes&lt;/b&gt;&lt;i class="before after"&gt;s&lt;u class="space"&gt; &lt;/u&gt;end&lt;/i&gt;s&lt;u class="space"&gt; &lt;/u&gt;now.&lt;/p&gt;</code></pre>
+<h3 id="enter-intl.segmenter">Enter <code>Intl.Segmenter</code></h3>
+<p>A new API was <a
+href="https://caniuse.com/?search=Intl.Segmenter">recently</a> added to
+JavaScript as a global object in all major browsers: <a
+href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter">Intl.Segmenter</a>.</p>
+<p>Below is a demo that uses the Intl.Segmenter to parse the text of the
+HTML chunk just above. Here is the code that creates the segment objects
+that you see in the demo:</p>
+<pre class="language-javascript line-numbers" data-start="77"><code class="language-javascript line-numbers">      const source = document.getElementById("source");</code></pre>
+<pre class="skip"><code class="skip">...</code></pre>
+<pre class="language-javascript line-numbers" data-start="84"><code class="language-javascript line-numbers">        const text = source.textContent;
+
+        const lang = "en";
+        const options = { granularity: "word" };
+        const segmenter = new Intl.Segmenter(lang, options);
+        const words = Array.from(segmenter.segment(text));</code></pre>
+<p>Note that you need to tell the Intl.Segmenter instance what
+<code>lang</code>uage the input is going to be in, and what
+<code>granularity</code> you want to use.</p>
+<p>If you click on the checkbox in the green section at the top, a
+series of rules are applied to the different <code>&lt;i&gt;</code> and
+<code>&lt;u&gt;</code> blocks within that HTML chunk, in order to force
+the text to <em>appear</em> differently in the browser. The HTML itself
+does not change.</p>
+<p>However, the Intl.Segmenter cuts through the formatting noise, and
+just reads the raw <code>textContent</code> of the
+<code>&lt;p id="source"&gt;</code> element. It ignores any CSS
+formatting that may or may not be applied. As a result, as you can see,
+it produces exactly the same <code>segments</code> whether the checkbox
+is checked on not.</p>
+<iframe id="intl-segmenter" title="intl-segmenter" width="480" height="480" src="https://merncraft.github.io/Intl-Segmenter">
+</iframe>
+<details class="tldr">
+<summary>
+Try This at Home
+</summary>
+<pre class="language-html line-numbers"><code class="language-html line-numbers">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8" /&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
+    &lt;title&gt;Word Boundaries&lt;/title&gt;
+    &lt;style&gt;
+      body {
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+        height: 100vh;
+        color: #ddd;
+        background-color: #111;
+
+        label {
+          padding: 1em;
+          background-color: #060;
+        }
+
+        #source {
+          font-size: 1.5em;
+          color: #0c0;
+        }
+
+        u {
+          text-decoration: none;
+        }
+
+        &:has(input:checked) {
+          & #source {
+            color: #c00;
+
+            /* use non-breaking spaces to force letters apart */
+            i.after {
+              &::after {
+                content: "\00A0";
+                display: inline-block;
+              }
+            }
+            i.before::before {
+              content: "\00A0";
+              display: inline-block;
+            }
+            u {
+              font-size: 0;
+            }
+          }
+        }
+
+        #segments {
+          flex: 1;
+          overflow-y: auto;
+        }
+
+        pre {
+          white-space: pre-wrap;
+          
+          &::first-line {
+            font-size: 1.5em;
+          }
+        }
+      }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;label&gt;
+      &lt;span&gt;Use confusing CSS to change the spacing: &lt;/span&gt;
+      &lt;input type="checkbox" id="checkbox"&gt;
+    &lt;/label&gt;
+    &lt;p id="source"&gt;&lt;i class="after"&gt;The&lt;u&gt; &lt;/u&gt;ir&lt;/i&gt;&lt;b&gt;regular program&lt;u&gt; &lt;/u&gt;mes&lt;/b&gt;&lt;i class="before after"&gt;s&lt;u class="space"&gt; &lt;/u&gt;end&lt;/i&gt;s&lt;u class="space"&gt; &lt;/u&gt;now.&lt;/p&gt;
+    &lt;pre id="words"&gt;&lt;/pre&gt;
+    &lt;pre id="segments"&gt;&lt;/pre&gt;
+
+    &lt;script&gt;
+      const checkbox = document.getElementById("checkbox");
+      const source = document.getElementById("source");
+      const wordsPre = document.getElementById("words");
+      const segmentsPre = document.getElementById("segments");
+
+      checkbox.addEventListener("change", segmentText)
+
+      function segmentText() {
+        const text = source.textContent;
+
+        const lang = "en";
+        const options = { granularity: "word" };
+        const segmenter = new Intl.Segmenter(lang, options);
+        const words = Array.from(segmenter.segment(text));
+        const justWords = words
+          .filter((item) =&gt; item.isWordLike)
+          .map((item) =&gt; item.segment);
+
+        wordsPre.textContent = `words:
+${JSON.stringify(justWords, null, "  ")}`;
+        segmentsPre.textContent = `segments:
+${JSON.stringify(words, null, "  ")}`;
+      }
+
+      segmentText()
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</details>
+<p>First, I’ll show you how to create a mental image of what
+Intl.Segmenter does, and then you can practise getting it to work
+together with the Selection, Range and container objects that you have
+already seen.</p>
+</section>
 <style>
   code u,
   code u * {
