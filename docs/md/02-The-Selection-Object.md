@@ -73,7 +73,7 @@ You can find the full script of this demo in the _Try This at Home_ section belo
 
 To create the same demo on your own computer, you can clone the [GitHub repository](https://github.com/MERNCraft/SelectionAndRange), or follow the instructions below.
 
-1. Greate a file called `index.html` 
+1. Greate a file called `getSelection.html` 
 2. Copy and paste the HTML shown below into it
 3. Open the file in your Browser
    

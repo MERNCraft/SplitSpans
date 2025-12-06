@@ -144,7 +144,7 @@ Try This at Home
 href="https://github.com/MERNCraft/SelectionAndRange">GitHub
 repository</a>, or follow the instructions below.</p>
 <ol type="1">
-<li>Greate a file called <code>index.html</code></li>
+<li>Greate a file called <code>getSelection.html</code></li>
 <li>Copy and paste the HTML shown below into it</li>
 <li>Open the file in your Browser</li>
 </ol>
@@ -452,7 +452,7 @@ extended.</p>
 <p>One standard now is <a
 href="https://en.wikipedia.org/wiki/UTF-16">UTF-16</a>, which has
 variable-length blocks from 8 to 32 bits, and which provides enough
-numbers, to label the 1,112,064 different symbols from many different
+numbers to label the 1,112,064 different symbols from many different
 languages that are recognized today. And it turns out that UTF-16 still
 has a few numbers left over, and these are now being used for
 emojis.</p>
@@ -798,16 +798,21 @@ end-users are likely to use.</p>
 <h2>
 <a href="#word-boundaries">Word Boundaries</a>
 </h2>
-<p>Where does one word end and the next word begin? Since your early
-childhood, you have been able to detect word boundaries in spoken
-speech. Try asking a two-year old to say “speedboat”. (Make sure you
-pronounce the “d”.) The chances are that the child will answer with two
-words with a distinct gap between them: “speed … boat”. That’s because
-the sequence “db” is very unusual in English words. Before children can
-say the words “statistical probability”, their brains are busy analysing
-the sounds they hear according to statistical probability.</p>
-<p>You need to take a quick glance at these two sentences to know that
-they are different, and that the words need to be pronounced
+<p>Where does one word end and the next word begin?</p>
+<p>Since your early childhood, you have been able to detect word
+boundaries in spoken speech. Try asking a two-year old to say
+“speedboat”. (Make sure you pronounce the “d”.) The chances are that the
+child will answer with two words, with a distinct gap between them:
+“speed … boat”. That’s because the sequence “db” is very unusual in
+English words. Before children can say the words “statistical
+probability”, their brains are busy analysing the sounds they hear
+according to statistical probability. And their brains tell them that
+“db” is very rare in the middle of a word, so it must be a word
+break.</p>
+<p>But how can a web browser do this?</p>
+<h3 id="messing-with-white-space">Messing with white space</h3>
+<p>You only need to take a quick glance at the two sentences below to
+know that they are different, and that the words need to be pronounced
 differently, possibly with a different accent:</p>
 <blockquote>
 <p>The irregular program mess ends now.</p>
@@ -829,37 +834,59 @@ what you are looking for?</p>
 href="https://caniuse.com/?search=Intl.Segmenter">recently</a> added to
 JavaScript as a global object in all major browsers: <a
 href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter">Intl.Segmenter</a>.</p>
+<details class="warn" open>
+<summary>
+Work in Progress
+</summary>
+<p>At the time of writing, Intl.Segmenter is still not doing everything
+that is planned for it to do. By the time you read this, it may have
+improved. You might find that some of the limitations I describe here no
+longer cause any problems.</p>
+</details>
 <p>Below is a demo that uses the Intl.Segmenter to parse the text of the
-HTML chunk just above. Here is the code that creates the segment objects
-that you see in the demo:</p>
-<pre class="language-javascript line-numbers" data-start="77"><code class="language-javascript line-numbers">      const source = document.getElementById("source");</code></pre>
-<pre class="skip"><code class="skip">...</code></pre>
-<pre class="language-javascript line-numbers" data-start="84"><code class="language-javascript line-numbers">        const text = source.textContent;
+HTML chunk just above. Here is a simplified version of the code that
+creates the segment objects that you see in the demo:</p>
+<pre class="language-javascript"><code class="language-javascript">      const source = document.getElementById("source");
+      const text = source.textContent;
 
-        const lang = "en";
-        const options = { granularity: "word" };
-        const segmenter = new Intl.Segmenter(lang, options);
-        const words = Array.from(segmenter.segment(text));</code></pre>
+      const lang = "en";
+      const options = { granularity: "word" };
+      const segmenter = new Intl.Segmenter(lang, options);
+      const segments = Array.from(segmenter.segment(text));</code></pre>
 <p>Note that you need to tell the Intl.Segmenter instance what
 <code>lang</code>uage the input is going to be in, and what
-<code>granularity</code> you want to use.</p>
+<code>granularity</code> you want to use. For language, it makes sense
+to use “en” (for English).</p>
+<p>The values for <code>granularity</code> are <em>grapheme</em>,
+<em>word</em> and <em>sentence</em>. In English, using <em>grapheme</em>
+will split your text into individual characters: each letter, space and
+punctuation mark will be treated separately. When dealing with emoji or
+certain other writing systems, a grapheme corresponds to a single visual
+item which is never divided into its constituent parts.</p>
 <p>If you click on the checkbox in the green section at the top, a
 series of rules are applied to the different <code>&lt;i&gt;</code> and
-<code>&lt;u&gt;</code> blocks within that HTML chunk, in order to force
-the text to <em>appear</em> differently in the browser. The HTML itself
-does not change.</p>
-<p>However, the Intl.Segmenter cuts through the formatting noise, and
-just reads the raw <code>textContent</code> of the
-<code>&lt;p id="source"&gt;</code> element. It ignores any CSS
-formatting that may or may not be applied. As a result, as you can see,
+<code>&lt;u&gt;</code> blocks within the HTML chunk shown above. This
+will force the text to <em>appear</em> differently in the browser. The
+HTML itself does not change.</p>
+<p>However, the Intl.Segmenter ignores all the formatting, and just
+reads the raw <code>textContent</code> of the
+<code>&lt;p id="source"&gt;</code> element. As a result, as you can see,
 it produces exactly the same <code>segments</code> whether the checkbox
 is checked on not.</p>
-<iframe id="intl-segmenter" title="intl-segmenter" width="480" height="480" src="https://merncraft.github.io/Intl-Segmenter">
+<iframe id="intl-segmenter-demo" title="intl-segmenter" width="480" height="800" src="https://merncraft.github.io/Intl-Segmenter">
 </iframe>
 <details class="tldr">
 <summary>
 Try This at Home
 </summary>
+<p>To create the same demo on your own computer, you can clone the <a
+href="https://github.com/MERNCraft/Intl-Segmenter">GitHub
+repository</a>, or follow the instructions below.</p>
+<ol type="1">
+<li>Greate a file called <code>Intl_Segmenter.html</code></li>
+<li>Copy and paste the HTML shown below into it</li>
+<li>Open the file in your Browser</li>
+</ol>
 <pre class="language-html line-numbers"><code class="language-html line-numbers">&lt;!DOCTYPE html&gt;
 &lt;html lang="en"&gt;
   &lt;head&gt;
@@ -875,21 +902,73 @@ Try This at Home
         color: #ddd;
         background-color: #111;
 
-        label {
-          padding: 1em;
+        & div#settings {
           background-color: #060;
+          padding: 0 1em 1em;
+
+          #use-css {
+            opacity: 0.5;
+            pointer-events: none;
+
+            &.active {
+              opacity: 1;
+              pointer-events: all;
+            }
+          }
+
+          & &gt; label,
+          & details &gt; label {
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin-top: 1em;
+          }
+
+          & details {
+            & div {
+              text-align: center;
+              margin-top: 1em;
+
+              &.language {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                input[type=radio] {
+                  position: absolute;
+                  left: -999vw;
+
+                  &:checked ~ img {
+                    opacity: 1;
+                    border-color: white;
+                    box-shadow: 0 0 10px white;
+                  }
+                }
+                & label img {
+                  width: 1.5em;
+                  margin-left: 0.5em;
+                  opacity: 0.75;
+                  border: 1px solid transparent;
+                  border-radius: 1em;
+                }
+              }
+            }
+          }
         }
 
-        #source {
-          font-size: 1.5em;
+
+        & p[lang] {
+          font-size: 1.2em;
           color: #0c0;
+          text-align: center;
+          display: none;
         }
 
         u {
           text-decoration: none;
         }
 
-        &:has(input:checked) {
+        &:has(#checkbox:checked) {
           & #source {
             color: #c00;
 
@@ -917,57 +996,798 @@ Try This at Home
 
         pre {
           white-space: pre-wrap;
-          
+
           &::first-line {
             font-size: 1.5em;
           }
         }
+
+        #identical {
+          color: #0c0;
+          text-align: center;
+
+          &:empty {
+            display: none;
+          }
+        }
+      }
+
+      .selected {
+        display: block!important
       }
     &lt;/style&gt;
   &lt;/head&gt;
+
   &lt;body&gt;
-    &lt;label&gt;
-      &lt;span&gt;Use confusing CSS to change the spacing: &lt;/span&gt;
-      &lt;input type="checkbox" id="checkbox"&gt;
-    &lt;/label&gt;
-    &lt;p id="source"&gt;&lt;i class="after"&gt;The&lt;u&gt; &lt;/u&gt;ir&lt;/i&gt;&lt;b&gt;regular program&lt;u&gt; &lt;/u&gt;mes&lt;/b&gt;&lt;i class="before after"&gt;s&lt;u class="space"&gt; &lt;/u&gt;end&lt;/i&gt;s&lt;u class="space"&gt; &lt;/u&gt;now.&lt;/p&gt;
+    &lt;div id="settings"&gt;
+      &lt;label id="use-css"&gt;
+        &lt;span&gt;Use CSS to change the spacing:&lt;/span&gt;
+        &lt;input type="checkbox" id="checkbox"&gt;
+      &lt;/label&gt;
+
+      &lt;details id="details"&gt;
+        &lt;summary&gt;More&lt;/summary&gt;
+
+        &lt;div class="language"&gt;
+          &lt;span&gt;Text in:&lt;/span&gt;
+          &lt;label&gt;
+            &lt;input type="radio" name="language" id="en" checked&gt;
+            &lt;img src="images/en-GB.png" checked alt="English" title="English"&gt;
+          &lt;/label&gt;
+          &lt;label&gt;
+            &lt;input type="radio" name="language" id="am" &gt;
+            &lt;img src="images/am.png" alt="አማርኛ" title="አማርኛ Amharic"&gt;
+          &lt;/label&gt;
+          &lt;label&gt;
+            &lt;input type="radio" name="language" id="ar"&gt;
+            &lt;img src="images/ar.png" alt="عربي" title="عربي Arabic"&gt;
+          &lt;/label&gt;
+          &lt;label&gt;
+            &lt;input type="radio" name="language" id="bn"&gt;
+            &lt;img src="images/bn.png" alt="বাংলা" title="বাংলা Bengali"&gt;
+          &lt;/label&gt;
+          &lt;label&gt;
+            &lt;input type="radio" name="language" id="fr"&gt;
+            &lt;img src="images/fr-FR.png" alt="Français" title="Français French"&gt;
+          &lt;/label&gt;
+          &lt;label&gt;
+            &lt;input type="radio" name="language" id="hi"&gt;
+            &lt;img src="images/hi.png" alt="हिंदी" title="हिंदी Hindi"&gt;
+          &lt;/label&gt;
+          &lt;label&gt;
+            &lt;input type="radio" name="language" id="iu"&gt;
+            &lt;img src="images/iu.png" alt="ᐃᓄᒃᑎᑐᑦ" title="ᐃᓄᒃᑎᑐᑦ Inuktut"&gt;
+          &lt;/label&gt;
+          &lt;label&gt;
+            &lt;input type="radio" name="language" id="ja"&gt;
+            &lt;img src="images/ja.png" alt="日本語" title="日本語 Japanese"&gt;
+          &lt;/label&gt;
+          &lt;label&gt;
+            &lt;input type="radio" name="language" id="ko"&gt;
+            &lt;img src="images/ko.png" alt="한국인" title="한국인 Korean"&gt;
+          &lt;/label&gt;
+          &lt;label&gt;
+            &lt;input type="radio" name="language" id="ru"&gt;
+            &lt;img src="images/ru.png" alt="Русский" title="Русский Russian"&gt;
+          &lt;/label&gt;
+          &lt;label&gt;
+            &lt;input type="radio" name="language" id="ta"&gt;
+            &lt;img src="images/ta.png" alt="தமிழ்" title="தமிழ் Tamil"&gt;
+          &lt;/label&gt;
+          &lt;label&gt;
+            &lt;input type="radio" name="language" id="th"&gt;
+            &lt;img src="images/th.png" alt="ไทย" title="ไทย Thai"&gt;
+          &lt;/label&gt;
+        &lt;/div&gt;
+
+        &lt;div class="options"&gt;
+          new Intl.Segmenter ({
+          &lt;label&gt;
+            &lt;span&gt;lang:&lt;/span&gt;
+            &lt;select id="lang"&gt;
+              &lt;option value="en" selected&gt;en&lt;/option&gt;
+              &lt;option value="am"&gt;am&lt;/option&gt;
+              &lt;option value="ar"&gt;ar&lt;/option&gt;
+              &lt;option value="bn"&gt;bn&lt;/option&gt;
+              &lt;option value="fr"&gt;fr&lt;/option&gt;
+              &lt;option value="hi"&gt;hi&lt;/option&gt;
+              &lt;option value="ja"&gt;ja&lt;/option&gt;
+              &lt;option value="ko"&gt;ko&lt;/option&gt;
+              &lt;option value="iu"&gt;iu&lt;/option&gt;
+              &lt;option value="ru"&gt;ru&lt;/option&gt;
+              &lt;option value="ta"&gt;ta&lt;/option&gt;
+              &lt;option value="th"&gt;th&lt;/option&gt;
+            &lt;/select&gt;
+          &lt;/label&gt;
+          ,
+          &lt;label&gt;
+            &lt;span&gt;granularity:&lt;/span&gt;
+            &lt;select id="granularity"&gt;
+              &lt;option value="grapheme"&gt;grapheme&lt;/option&gt;
+              &lt;option value="word" selected&gt;word&lt;/option&gt;
+              &lt;option value="sentence"&gt;sentence&lt;/option&gt;
+            &lt;/select&gt;
+          &lt;/label&gt;
+          })
+        &lt;/div&gt;
+
+        &lt;label&gt;
+          &lt;span&gt;Compare segmentation across all languages&lt;/span&gt;
+          &lt;input type="checkbox" id="check-all"&gt;
+        &lt;/label&gt;
+      &lt;/details&gt;
+    &lt;/div&gt;
+    &lt;p id="source" lang="en" class="selected"&gt;&lt;i class="after"&gt;The<u> </u>ir</i><b>regular program<u> </u>mes</b>&lt;i class="before after"&gt;s&lt;u class="space"&gt; </u>end</i>s&lt;u class="space"&gt; </u>now.&lt;/p&gt;
+    &lt;p lang="am"&gt;አማርኛ ፡ የኢትዮጵያ ፡ መደበኛ ፡ ቋንቋ ፡ ነው ። ሴማዊ ፡ ቋንቋዎች ፡ ውስጥ ፡ የሚመደብ ፡ ሲሆን ፡ ካረቢኛ ፡ ቀጥሎ ፡ ሁለተኛ ፡ ብዙ ፡ ተናጋሪዎች ፡&lt;/p&gt;
+    &lt;p lang="ar"&gt;العربية لغةٌ رسمية في كل دول الوطن العربي&lt;/p&gt;
+    &lt;p lang="bn"&gt;বাংলা সার্বভৌম ভাষাভিত্তিক জাতিরাষ্ট্র বাংলাদেশের একমাত্র রাষ্ট্রভাষা তথা সরকারি ভাষা।&lt;/p&gt;
+    &lt;p lang="fr"&gt;Les premières occurrences du mot « France » en langue française se rencontrent au XIe siècle.&lt;/p&gt;
+    &lt;p lang="hi"&gt;हिन्दी संवैधानिक रूप से भारत की राजभाषा और भारत की सबसे अधिक बोली और समझी जाने वाली भाषा है।&lt;/p&gt;
+    &lt;p lang="ja"&gt;日本において、国号を直接かつ明確に規定した法令は存在しない。&lt;/p&gt;
+    &lt;p lang="ko"&gt;한국어(韓國語) 또는 조선어(朝鮮語)는 대한민국과 조선민주주의인민공화국의 공용어이다. 둘은 표기나 문법, 동사 어미, 표현에서 약간의 차이가 있다.&lt;/p&gt;
+    &lt;p lang="iu"&gt;ᐃᓅᔪᓕᒫᑦ ᐊᓂᖅᑎᕆᔪᓕᒫᑦ ᐃᓅᓚᐅᕐᒪᑕ ᐃᓱᒪᕐᓱᕐᓚᑎᒃ ᐊᒻᒪᓗ ᐊᔾᔨᐅᖃᑎᒦᒃᓗᑎᒃ ᓂᕐᓱᐊᖑᓂᒃᑯᑦ ᐊᒻᒪᓗ ᐱᔪᓐᓀᑎᑎᒍᑦ.&lt;/p&gt;
+    &lt;p lang="ru"&gt;Россия — многонациональное государство с широким этнокультурным многообразием.&lt;/p&gt;
+    &lt;p lang="ta"&gt;நான் பள்ளிக்குச் சென்று வருகிறேன்.&lt;/p&gt;
+    &lt;p lang="th"&gt;ประเทศไทยมีประชากรเกือบ 66 ล้านคน พื้นที่ประมาณ 513,115 ตารางกิโลเมตร&lt;/p&gt;
+
     &lt;pre id="words"&gt;&lt;/pre&gt;
+    &lt;p id="identical"&gt;&lt;/p&gt;
     &lt;pre id="segments"&gt;&lt;/pre&gt;
 
+
     &lt;script&gt;
-      const checkbox = document.getElementById("checkbox");
-      const source = document.getElementById("source");
-      const wordsPre = document.getElementById("words");
-      const segmentsPre = document.getElementById("segments");
+      const useCSS = document.getElementById("use-css")
+      const checkbox = document.getElementById("checkbox")
+      const details = document.getElementById("details")
+      const triggers = Array.from(
+        document.querySelectorAll("[name=language]")
+      )
+      const checkAll = document.getElementById("check-all")
+      const select = document.getElementById("lang")
+      const granularity = document.getElementById("granularity")
+      triggers.push(checkAll)
+      triggers.push(select)
+      triggers.push(granularity)
+
+      const wordsPre = document.getElementById("words")
+      const identical = document.getElementById("identical")
+      const segmentsPre = document.getElementById("segments")
+      const phrases = Array.from(
+        document.querySelectorAll("p[lang]")
+      )
+      const langs = phrases.map(
+        phrase =&gt; phrase.getAttribute("lang")
+      )
+
+      let languageId
 
       checkbox.addEventListener("change", segmentText)
+      details.addEventListener("toggle", toggleDetails)
+      triggers.forEach( trigger =&gt; {
+        trigger.addEventListener("change", setLanguage)
+      })
+
 
       function segmentText() {
-        const text = source.textContent;
+        const selector = `p[lang=${languageId}]`
+        const source = document.querySelector(selector)
+        const text = source.textContent
 
-        const lang = "en";
-        const options = { granularity: "word" };
-        const segmenter = new Intl.Segmenter(lang, options);
-        const words = Array.from(segmenter.segment(text));
-        const justWords = words
+        const lang = select.value
+        const options = { granularity: granularity.value }
+        const segmenter = new Intl.Segmenter(lang, options)
+        const segments = Array.from(segmenter.segment(text))
+
+        let items = segments
           .filter((item) =&gt; item.isWordLike)
-          .map((item) =&gt; item.segment);
+          .map((item) =&gt; item.segment)
 
-        wordsPre.textContent = `words:
-${JSON.stringify(justWords, null, "  ")}`;
+          if (items.length) {
+          items = `words:
+${JSON.stringify(items, null, "  ")}`
+        } else {
+          const count = segments.length
+          const s = count === 1 ? "" : "s"
+          items = `${segments.length} ${granularity.value}${s} found`
+        }
+
+        wordsPre.textContent = items
         segmentsPre.textContent = `segments:
-${JSON.stringify(words, null, "  ")}`;
+${JSON.stringify(segments, null, "  ")}`
+
+        if (checkAll.checked) {
+          checkAllLanguageSettings(text)
+
+        } else {
+          identical.textContent = ""
+        }
       }
 
-      segmentText()
+
+      function checkAllLanguageSettings(text) {
+        // Segment the current text using all values of lang
+        const sets = langs.map( lang =&gt; {
+          const options = { granularity: granularity.value }
+          const segmenter = new Intl.Segmenter(lang, options)
+          const segments = Array.from(segmenter.segment(text))
+          segments.lang = lang
+
+          return segments
+        })
+
+        // Pair each segmentation with one from a different lang
+        const pairs = sets.reduce(( pairs, original, index) =&gt; {
+          const compare =  (index)
+            ? sets[index - 1]
+            : sets[sets.length - 1]
+
+            pairs.push([ original, compare ])
+          return pairs
+        }, [])
+
+        // If every pair contains identical segmentations, then
+        // all the segmentations are identical.
+        const same = pairs.every(([ original, compare ]) =&gt; (
+          JSON.stringify(original) === JSON.stringify(compare)
+        ))
+
+        identical.innerHTML = `Segmentation results with all language settings are: <b>${same ? "identical" : "different"}</b>`
+      }
+
+
+      function toggleDetails({ target }) {
+        if (!target.open) {
+          // When details or closed, stop checking all languages...
+          checkAll.checked = false
+          // ... check only English...
+          select.value = "en"
+          // ... segment into words...
+          granularity.value = "word"
+          // ... and select the English text...
+          target = triggers[0]
+          target.checked = true
+          // ... just as it was after the page first loaded
+          setLanguage({ target })
+        }
+      }
+
+
+      function setLanguage({ target }) {
+        const { id, tagName } = target
+        if ( id !== "check-all"
+          && id !== "lang"
+          && id !== "granularity"
+           ) {
+          languageId = id
+        }
+        phrases.forEach( phrase =&gt; {
+          const action = (phrase.getAttribute("lang") === languageId)
+            ? "add"
+            : "remove"
+          phrase.classList[action]("selected")
+        })
+
+        const action = (id === "en")
+          ? "add"
+          : "remove"
+          useCSS.classList[action]("active")
+
+        segmentText()
+      }
+
+
+      const target = document.querySelector("[type=radio]:checked")
+      setLanguage({ target })
+
     &lt;/script&gt;
   &lt;/body&gt;
 &lt;/html&gt;</code></pre>
 </details>
-<p>First, I’ll show you how to create a mental image of what
-Intl.Segmenter does, and then you can practise getting it to work
-together with the Selection, Range and container objects that you have
-already seen.</p>
+<p>As before, you might like to open this page in a different browser
+window, so that you can interact with this demo as you continue reading
+this tutorial.</p>
+</section>
+<!-- Intl.Segmenter -->
+<section id="intl-segmenter-language" aria-labelledby="intl-segmenter-language" data-item="Intl.Segmenter language">
+<h2>
+<a href="#intl-segmenter">Intl.Segmenter: language</a>
+</h2>
+<p>You’ve just seen that Intl.Segmenter can detect where words begin and
+end in English. <em>But</em>, you say, <em>that’s easy. There are breaks
+between words when there is a space, or a punctuation mark.</em></p>
+<p>“Ah!” I answer. “You’re 100% sure about that? Where are the
+word-endings in the phrase ‘the children’s dogs’ toys’?”</p>
+<p>And what about languages like Japanese, Korean and Thai, where spaces
+are not used between words? Or languages like Arabic, which use
+different letter forms for the same letters if it appears at the start,
+in the middle, or at the end of a word?</p>
+<h3 id="more">More</h3>
+<p>If you click on the word <code>&gt; More</code> in the demo you’ve
+just seen, you can explore examples in 12 different languages. Most of
+the sentences in the demo are taken from the Wikipedia article about the
+language or the country in the given language. Here’s how a sentence in
+Japanese is segmented into words:</p>
+<figure>
+<img src="images/japanese.webp"
+alt="Splitting text into words in Japanese" />
+<figcaption aria-hidden="true">Splitting text into words in
+Japanese</figcaption>
+</figure>
+<p>You’ve already seen that that you need to tell the Intl.Segmenter
+what language you want to segment, as well as what <em>granularity</em>
+you want. Something like this:</p>
+<pre class="language-js"><code class="language-js">const lang = "en";
+const options = { granularity: "word" };
+const segmenter = new Intl.Segmenter(lang, options);</code></pre>
+<p>You may be surprised (I certainly was), that choosing
+<code>"en"</code> for segmenting Japanese text seems to work rather
+well. Indeed, the results do not look very different from what you get
+if you choose “ja” as the language code for segmenting Japanese
+text:</p>
+<figure>
+<img src="images/japanese_with_ja.webp"
+alt="Using “ja” to split Japanese text into words" />
+<figcaption aria-hidden="true">Using “ja” to split Japanese text into
+words</figcaption>
+</figure>
+<h3 id="identical-results-across-language-settings">Identical results
+across language settings</h3>
+<p>Indeed, just to make sure that I wasn’t missing something subtle, I
+added a test in my demo, to segment the text of any chosen language
+using a segmenter set to use <em>every other language</em>, and found
+that the results in all cases are identical. Check the Compare
+Segmentation Across All Languages checkbox to run this test for
+whichever language you choose.</p>
+<figure>
+<img src="images/identical.webp"
+alt="Using “ja” to split Japanese text into words" />
+<figcaption aria-hidden="true">Using “ja” to split Japanese text into
+words</figcaption>
+</figure>
+<p>The segmentation results for all the languages in this demo are
+always identical, regardless of the language that the Intl.Segmenter
+instance is told to expect. Click below to see the test that I
+wrote.</p>
+<details class="tldr">
+<summary>
+Testing segmentation with Segmenters in all languages
+</summary>
+<p>You can find the full text of the HTML page at <a
+href="https://github.com/MERNCraft/Intl-Segmenter">GitHub
+repository</a>.</p>
+<pre class="language-js line-numbers" data-start="318"><code class="language-js line-numbers">      function checkAllLanguageSettings(text) {
+        // Segment the current text using all values of lang
+        const sets = langs.map( lang =&gt; {
+          const options = { granularity: granularity.value }
+          const segmenter = new Intl.Segmenter(lang, options)
+          const segments = Array.from(segmenter.segment(text))
+          segments.lang = lang
+
+          return segments
+        })
+
+        // Pair each segmentation with one from a different lang
+        const pairs = sets.reduce(( pairs, original, index) =&gt; {
+          const compare =  (index)
+            ? sets[index - 1]
+            : sets[sets.length - 1]
+
+            pairs.push([ original, compare ])
+          return pairs
+        }, [])
+
+        // If every pair contains identical segmentations, then
+        // all the segmentations are identical.
+        const same = pairs.every(([ original, compare ]) =&gt; (
+          JSON.stringify(original) === JSON.stringify(compare)
+        ))
+
+        identical.innerHTML = `Segmentation results with all language settings are: <b>${same ? "identical" : "different"}</b>`
+      }</code></pre>
+</details>
+<details class="note" open>
+<summary>
+More to come?
+</summary>
+<p>The <a
+href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter/Segmenter#parameters">MDN
+documentation</a> indicates that this parameter is
+<em>optional</em>.</p>
+<p>Perhaps this is a sign that Intl.Segmenter is able to recognize what
+segmentation rules to apply based on the character codes usend in the
+text being segmented… in which case it is already doing an excellent
+job, and no language setting is unnecessary.</p>
+<p>Perhaps the language setting has been included now to allow for more
+fine-tuned segmentation in the future. In this case, it would make make
+sense to <strong>provide the correct language setting</strong>, so that
+your code can profit from better segmentation in future browsers.</p>
+</details>
+</section>
+<!-- Intl.Segmenter granularity -->
+<!-- Graphemes -->
+<section id="graphemes" aria-labelledby="graphemes" data-item="Graphemes">
+<h2>
+<a href="#graphemes">Graphemes</a>
+</h2>
+<p>The <a
+href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter/Segmenter#parameters">second
+parameter</a> that you can use when you create a new Intl.Segmenter
+instance is an object, which allows you to define the
+<em>granularity</em> and a <em>localeMatcher</em>.</p>
+<details class="pivot" open>
+<summary>
+Further reading
+</summary>
+<p>I won’t treat <em>localeMatcher</em> here, but you can find more
+information about this in <a
+href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#locale_identification_and_negotiation">the
+entry for Intl on the MDN web site</a>.</p>
+</details>
+<h3 id="what-is-a-grapheme">What is a <code>grapheme</code>?</h3>
+<p>A grapheme is not a letter, and it is not a Unicode code point. It is
+a visual representation of something meaningful.</p>
+<p>Here are three emojis:</p>
+<p style="font-size: 5em; text-align: center">
+🌘🐈🐈‍⬛
+</p>
+<p>(You could imagine that this means: “At night, all cats are
+grey.”)</p>
+<p>Each emoji is a grapheme. Try this:</p>
+<ol type="1">
+<li>Copy the moon and cats emojis</li>
+<li>Open the Console in your browser</li>
+<li>Type <code>e = "🌘🐈🐈‍⬛"</code></li>
+<li>Type <code>s = new Intl.Segmenter()</code> (Note that, by default,
+Intl.Segmenter uses “grapheme” for its granularity.)</li>
+<li>Type <code>Array.from(s.segment(e))</code> (I’ll explain the
+<code>Array.from()</code> in a moment.)</li>
+</ol>
+<p>You will probably see something like this:</p>
+<figure>
+<img src="images/cats.webp"
+alt="A tabby cat and a black cat become two tabby cats and a black square" />
+<figcaption aria-hidden="true">A tabby cat and a black cat become two
+tabby cats and a black square</figcaption>
+</figure>
+<ol start="6" type="1">
+<li>Now type this: <code>e.split("")</code></li>
+</ol>
+<p>Here’s the output I get:</p>
+<pre class="node line-numbers"><code class="node line-numbers">[ '\ud83c', '\udf18', '\ud83d', '\udc08', '\ud83d', '\udc08', '‍', '⬛' ]</code></pre>
+<h3 id="surrogate-characters">Surrogate characters</h3>
+<p>Unicode uses <code>UTF-16</code>, which uses the numbers
+<code>0</code> to <code>2^16 - 1</code> (65535). That’s 65536 numbers,
+but Chinese has over 70000 characters all of its own.</p>
+<p>To create extra place to which to assign all the different symbols
+that humans currently communicate with, Unicode uses a trick <a
+href="https://www.johndcook.com/blog/2025/03/09/unicode-surrogates/">described
+in detail here</a>. In short, it defines a set of high-value 16-bit
+numbers as <em>surrogates</em>, and decides that these numbers <em>on
+their own</em> have no meaning, but <em>when used in pairs</em> take on
+a specific meaning.</p>
+<p>In your browser console, try:</p>
+<ol start="7" type="1">
+<li><code>[ '\ud83c', '\udf18' ].join("")</code></li>
+</ol>
+<p>Do you see a crescent moon? But <code>'\ud83c'</code> on its own, is
+just an echo of itself.</p>
+<p>For fun, try:</p>
+<ol start="8" type="1">
+<li><code>[ '\ud83c', '\udf17' ].join("")</code></li>
+</ol>
+<p>Do you see the moon in its third quarter?</p>
+<p>And a longer sequence like…</p>
+<ol start="9" type="1">
+<li><code>[ '\ud83d', '\udc08', '‍', '⬛' ].join("")</code></li>
+</ol>
+<p>… can produce a cat-which-is-black in your browser page.</p>
+<details class="note" open>
+<summary>
+Zero-Width Joiner (ZWJ)
+</summary>
+<p>Note that the character <code>'‍'</code> in the array above is not an
+empty string. It’s a <a
+href="https://en.wikipedia.org/wiki/Zero-width_joiner">zero-width
+joiner</a>, and it’s used to indicate that two separate characters
+should be treated as one.</p>
+<p>When writing in Hindi, for instance, this sequence…</p>
+<blockquote>
+<p>[ka <code>क</code>] [virāma ्] [ZWJ] [ṣa <code>ष</code>]</p>
+</blockquote>
+<p>… is interpreted as this single character:</p>
+<blockquote>
+<p><code>क्‍ष</code></p>
+</blockquote>
+<p>In the black cat emoji, the zero-width joiner is used to indicate
+that the cat emoji and the black colour character should be combined to
+make a single black cat grapheme.</p>
+<p>Here’s how you can see that <code>'‍'</code> is not an <em>empty</em>
+string, and that the black square character is a string like any
+other.</p>
+<pre class="node line-numbers"><code class="node line-numbers">&gt; '‍'.charCodeAt(0)
+8205
+&gt; '⬛'.charCodeAt(0)
+11035</code></pre>
+</details>
+<h3 id="non-emoji-multiple-character-graphemes">Non-emoji
+multiple-character graphemes</h3>
+<p>You’ve seen that a black cat is defined as four different Unicode
+code points. The same technique is applied to create a single grapheme
+from separate characters in many languages. Here, for example is how the
+first word of a sentence in Tamil (translation: “I am going to school.”)
+is segmented into graphemes by Intl.Segmenter:</p>
+<figure>
+<img src="images/tamil.webp"
+alt="A Tamil sentence segmented into graphemes" />
+<figcaption aria-hidden="true">A Tamil sentence segmented into
+graphemes</figcaption>
+</figure>
+<p>At first glance, you might think that the first word (pronounced
+“Nāṉ”) is made of three or maybe four characters, but Intl.Segmenter
+knows that these should be combined to form only two graphemes.</p>
+<figure>
+<img src="images/tamil_word.webp"
+alt="The first word has two letters; the first letter (Nā) is in two parts" />
+<figcaption aria-hidden="true">The first word has two letters; the first
+letter (Nā) is in two parts</figcaption>
+</figure>
+<p>If you use the standard JavaScript <code>.split</code> String method,
+you will indeed see four characters…</p>
+<pre class="node line-numbers"><code class="node line-numbers">&gt; "நான்".split("")
+[ 'ந', 'ா', 'ன', '்' ]</code></pre>
+<p>… but Intl.Segmenter combines them the way a native Tamil speaker
+would:</p>
+<pre class="node line-numbers"><code class="node line-numbers">&gt; Array.from(s.segment("நான்"))
+[
+  { segment: 'நா', index: 0, input: 'நான்' },
+  { segment: 'ன்', index: 2, input: 'நான்' }
+]</code></pre>
+<p>If you are not a native Tamil speaker, it’s good to be able to trust
+Intl.Segmenter to help you understand what to do. And the advantage is
+that Intl.Segmenter provides this help for many many languages,
+including the ones that you already master, so you have one ready-made
+solution that you can use and re-use.</p>
+</section>
+<!-- Intl.Segmenter output -->
+<section id="intl-segmenter-segment" aria-labelledby="intl-segmenter-segment" data-item="The Segment Object">
+<h2>
+<a href="#intl-segmenter-segment">The Segment Object</a>
+</h2>
+<p>I promised that I would explain why I have been using
+<code>Array.from()</code>.</p>
+<p>Here’s what happens when I create a segmenter in Node.js or a browser
+console. (Note that I don’t use <code>let</code> or <code>const</code>,
+which means that the variables I create are global
+<code>var</code>s.)</p>
+<pre class="language-js"><code class="language-js">&gt; segmenter = new Intl.Segmenter("en", { granularity: "word" })
+Segmenter [Intl.Segmenter] {}
+&gt; segmenter.resolvedOptions()
+{ locale: 'en', granularity: 'word' }</code></pre>
+<p>Here’s what I get when I use its <code>segment()</code> method:</p>
+<pre class="language-js"><code class="language-js">&gt; output = segmenter.segment("Hello world!")
+{}</code></pre>
+<p>The console tells me that this is an object, but it does not give me
+any more details. But I can use <code>Array.from()</code> to generate an
+array from whatever this object holds:</p>
+<pre class="language-js"><code class="language-js">&gt; Array.from(output)
+[
+  {
+    segment: 'Hello',
+    index: 0,
+    input: 'Hello world!',
+    isWordLike: true
+  },
+  { segment: ' ',
+    index: 5,
+    input: 'Hello world!',
+    isWordLike: false
+  },
+  {
+    segment: 'world',
+    index: 6,
+    input: 'Hello world!',
+    isWordLike: true
+  },
+  { segment: '!',
+    index: 11,
+    input: 'Hello world!',
+    isWordLike: false     
+  }
+]</code></pre>
+<p>I’ll discuss the structure of the objects inside the
+<code>output</code> in the next section. First I’ll explain what kind of
+object <code>output</code> is, and what advantages there are for
+creating such an object.</p>
+<h3 id="segment-returns-an-iterable"><code>segment()</code> returns an
+<em>iterable</em></h3>
+<p>The output of the <code>new Intl.Segmenter().segment()</code> object
+is a <a
+href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter/segment/Segments">Segment</a>
+<a
+href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_generators#iterables">iterable</a>.
+This means that you can use a <code>for ( x of y ) { ... }</code> loop
+to iterate through it, just like you can with an array:</p>
+<pre class="language-js wrap"><code class="language-js wrap">&gt; for ( item of output ) { console.log(item) }
+{ segment: 'Hello', index: 0, input: 'Hello world!', isWordLike: true }
+{ segment: ' ', index: 5, input: 'Hello world!', isWordLike: false }
+{ segment: 'world', index: 6, input: 'Hello world!', isWordLike: true }
+{ segment: '!', index: 11, input: 'Hello world!', isWordLike: false }</code></pre>
+<details class="tip">
+<summary>
+Tip: use an Iterator object
+</summary>
+<p>You can also retrieve its <a
+href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_generators#iterators">iterator
+object</a>, and use that to step through its items:</p>
+<pre class="language-javascript wrap"><code class="language-javascript wrap">&gt; iterator = output[Symbol.iterator]()
+Object [Segmenter String Iterator] {}
+&gt; iterator.next()
+{
+  value: {
+    segment: 'Hello',
+    index: 0,
+    input: 'Hello world!',
+    isWordLike: true
+  },
+  done: false
+}
+&gt; iterator.next()
+{
+  value: { segment: ' ', index: 5, input: 'Hello world!', isWordLike: false },
+  done: false
+}
+&gt; iterator.next()
+{
+  value: {
+    segment: 'world',
+    index: 6,
+    input: 'Hello world!',
+    isWordLike: true
+  },
+  done: false
+}
+&gt; iterator.next()
+{
+  value: { segment: '!', index: 11, input: 'Hello world!', isWordLike: false },
+  done: false
+}
+&gt; iterator.next()
+{ value: undefined, done: true }</code></pre>
+</details>
+<h3 id="output.containing"><code>output.containing()</code></h3>
+<p>You can use <code>for ... of</code> loops with Arrays, Strings, Maps
+and Sets. You can also use an Iterator object (as described above) with
+these data types. Each type of object provides its own special set of
+functions, like <code>Array.filter()</code> or
+<code>Set.has()</code></p>
+<p>One feature that is unique to the Segment iterable is the
+<code>containing()</code> method. This accepts an integer index value as
+its argument, and returns the item which contains a grapheme at that
+index position:</p>
+<pre class="language-js wrap"><code class="language-js wrap">&gt; output.containing(7)
+{ segment: 'world', index: 6, input: 'Hello world!', isWordLike: true }</code></pre>
+<details class="note" open>
+<summary>
+Segments contain a range of index values
+</summary>
+<p>Segment iterables are the only iterable whose items can represent an
+array of index values. In the current example, the word “world” starts
+at index 6, and continues to index 10 inclusive. This means that you can
+use <code>Segment.containing()</code> to find which particular grapheme,
+word or sentence contains a particular index value.</p>
+</details>
+</section>
+<!-- Intl.Segmenter output -->
+<section id="intl-segmenter-format" aria-labelledby="intl-segmenter-format" data-item="Segment Format">
+<h2>
+<a href="#intl-segmenter-output">Segment Format</a>
+</h2>
+<p>When you first met the Intl.Segmenter, you saw what it the output of
+its <code>segment()</code> method is, when the <code>granularity</code>
+is set to <code>"word"</code>:</p>
+<pre class="language-js"><code class="language-js">[
+  {
+    "segment": "The",
+    "index": 0,
+    "input": "The irregular program mess ends now.",
+    "isWordLike": true
+  },
+  {
+    "segment": " ",
+    "index": 3,
+    "input": "The irregular program mess ends now.",
+    "isWordLike": false
+  }, ...
+]</code></pre>
+<p>Each consecutive object contains four property/value pairs:</p>
+<ol type="1">
+<li><code>"segment"</code>: a string (in this case, a whole word)</li>
+<li><code>"index"</code>: a non-negative number, indicating where the
+segment string starts in the text that was segmented</li>
+<li><code>"input"</code>: the entire text that was segmented</li>
+</ol>
+<p>And, only when the options argument is
+<code>{ granularity: "word" }</code>:</p>
+<ol start="4" type="1">
+<li><strong><code>"isWordLike"</code></strong>: <code>true</code> or
+<code>false</code>, depending on whether <code>"segment"</code>
+represents a word (<code>true</code>) or a non-word character like white
+space or a punctuation mark (<code>false</code>).</li>
+</ol>
+<h3
+id="granularity-grapheme"><code>{ granularity: "grapheme" }</code></h3>
+<p>The <code>"isWordLike"</code> property is not included in items
+generated with <code>{ granularity: "grapheme" }</code>, because there
+are no words: each <code>"segment"</code> is exactly one grapheme
+long.</p>
+<p>As you have already seen with emojis and Tamil, a grapheme can
+contain several code points, so the <code>"index"</code> of the
+following item might increase by more than one. If you look back at the
+<a href="#counting-units">Counting Units</a> section, you’ll see that
+<code>"index"</code> here refers to the same <code>UTF-16 units</code>
+that the <code>Range</code> object’s <code>startOffset</code> and
+<code>endOffset</code> counts.</p>
+<pre class="language-js"><code class="language-js">[
+  {
+    "segment": "T",
+    "index": 0,
+    "input": "The irregular program mess ends now."
+  },
+  {
+    "segment": "h",
+    "index": 1,
+    "input": "The irregular program mess ends now."
+  },
+  {
+    "segment": "e",
+    "index": 2,
+    "input": "The irregular program mess ends now."
+  },
+  {
+    "segment": " ",
+    "index": 3,
+    "input": "The irregular program mess ends now."
+  }, ...
+]</code></pre>
+<h3
+id="granularity-sentence"><code>{ granularity: "sentence" }</code></h3>
+<p>Unlike with <code>{ granularity: "words" }</code>, you will only find
+individual graphemes when <code>{ granularity: "sentence" }</code>, if
+you use an unconventional writing style:</p>
+<p>In the example below, both the singular opening parenthesis
+characters <code>)</code> are treated as the first character in a
+sentence. This leads to the last “sentence” being an opening parenthesis
+character <code>)</code> all on its own.</p>
+<pre class="node"><code class="node">&gt; segmenter = new Intl.Segmenter("en", { granularity: "sentence" })
+Segmenter [Intl.Segmenter] {}
+&gt; Array.from(segmenter.segment("Don't worry! Be happy!  )")) 
+[
+  {
+    segment: "Don't worry! ",
+    index: 0,
+    input: "Don't worry! Be happy!  )"
+  },
+  {
+    segment: 'Be happy!  ',
+    index: 13,
+    input: "Don't worry! Be happy!  )"
+  },
+  { segment: ')', index: 24, input: "Don't worry! Be happy!  )" }
+]</code></pre>
+<p>In other words, this last individual character is not a separate
+grapheme: it is a sentence of its own.</p>
+<p>The spaces that follow after a sentence are all included as part of
+that sentence. There are no separate entries for spaces like there are
+with <code>{ granularity: "words" }</code>.</p>
+</section>
+<!-- Selections and Segments -->
+<section id="selections-and-segments" aria-labelledby="selections-and-segments" data-item="Selections + Segments">
+<h2>
+<a href="#selections-and-segments">Selections and Segments</a>
+</h2>
+<p>If you now have a clear mental image of what both the Selection
+object and the Segment object are, and what they can do, then you should
+be ready to get them to work together.</p>
 </section>
 <style>
   code u,

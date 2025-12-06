@@ -29,7 +29,7 @@ And this was perfect, at least, for people using the same Latin alphabet as Engl
 
 But there is not just English in the world. There are many different writing scripts, like Arabic and the Indian Devanagari script, not to mention languages like Chinese which contain thousands of individual pictograms. To enable computers to handle all the thousands of different written symbols, the system of giving each symbol a number had to be extended.
 
-One standard now is [UTF-16](https://en.wikipedia.org/wiki/UTF-16), which has variable-length blocks from 8 to 32 bits, and which provides enough numbers, to label the 1,112,064 different symbols from many different languages that are recognized today. And it turns out that UTF-16 still has a few numbers left over, and these are now being used for emojis.
+One standard now is [UTF-16](https://en.wikipedia.org/wiki/UTF-16), which has variable-length blocks from 8 to 32 bits, and which provides enough numbers to label the 1,112,064 different symbols from many different languages that are recognized today. And it turns out that UTF-16 still has a few numbers left over, and these are now being used for emojis.
 
 So you might imagine that an emoji would take two character spaces, where English letters, numbers and punctuation take only one. But that is politically incorrect. Emojis that show humans and parts of humans can have different skin colours, so the 👍🏼 emoji takes two values: a generic thumbs-up plus a skin colour.
 
